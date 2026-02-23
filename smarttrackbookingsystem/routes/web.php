@@ -44,12 +44,32 @@ Route::middleware(['auth', 'usertype:org_admin'])
 
 Route::prefix('{business:slug}/admin')
     ->name('business.')
-    ->middleware(['auth','usertype:business_admin'])
+    ->middleware(['auth', 'usertype:business_admin'])
     ->group(function () {
-
-        Route::get('/dashboard',[AdminController::class,'index'])->name('dashboard');
-
-});
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        
+        // Settings Routes
+        Route::get('/settings', [App\Http\Controllers\Business\BusinessSettingsController::class, 'index'])
+            ->name('settings');
+        
+        Route::put('/settings/general', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateGeneral'])
+            ->name('settings.general');
+        
+        Route::put('/settings/appearance', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateAppearance'])
+            ->name('settings.appearance');
+        
+        Route::put('/settings/notifications', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateNotifications'])
+            ->name('settings.notifications');
+        
+        Route::put('/settings/invoice', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateInvoice'])
+            ->name('settings.invoice');
+        
+        Route::put('/settings/security', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateSecurity'])
+            ->name('settings.security');
+        
+        Route::post('/settings/remove-logo', [App\Http\Controllers\Business\BusinessSettingsController::class, 'removeLogo'])
+            ->name('settings.remove-logo');
+    });
 
 Route::middleware(['auth', 'usertype:employee'])
     ->get('/employee/dashboard', fn () => view('business.employee.dashboard'))
