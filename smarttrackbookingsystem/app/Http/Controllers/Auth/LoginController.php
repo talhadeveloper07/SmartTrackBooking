@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\BusinessAdmin;
 
 class LoginController extends Controller
 {
@@ -28,14 +29,28 @@ class LoginController extends Controller
      protected function redirectTo(): string
     {
         $userType = auth()->user()->user_type;
-
+        $user = auth()->user();
         return match ($userType) {
             'org_admin' => '/org/dashboard',
-            'business_admin'     => '/business/dashboard',
+            'business_admin' => $this->getBusinessAdminRedirect($user->id),
             'employee'           => '/employee/dashboard',
             'customer'           => '/customer/dashboard',
             default              => '/dashboard', // fallback
         };
+    }
+
+    private function getBusinessAdminRedirect($userId): string
+    {
+        $businessAdmin = BusinessAdmin::with('business')
+                            ->where('user_id', $userId)
+                            ->first();
+
+        // safety fallback
+        if (!$businessAdmin || !$businessAdmin->business) {
+            return '/login';
+        }
+
+        return '/' . $businessAdmin->business->slug . '/admin/dashboard';
     }
 
     /**
