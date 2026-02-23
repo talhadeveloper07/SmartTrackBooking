@@ -25,12 +25,12 @@ class Business extends Model
     /**
      * Get the admins for this business.
      */
-    public function admins()
-    {
-        return $this->belongsToMany(User::class, 'business_admins')
-            ->withPivot('permissions', 'status')
-            ->withTimestamps();
-    }
+   public function admins()
+{
+    return $this->belongsToMany(User::class, 'business_admins')
+        ->withPivot('permissions', 'status', 'position') // add position
+        ->withTimestamps();
+}
 
     /**
      * Get the employees for this business.
@@ -54,5 +54,10 @@ class Business extends Model
     public function isActive()
     {
         return $this->status === 'active';
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

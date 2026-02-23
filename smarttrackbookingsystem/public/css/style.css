@@ -26937,7 +26937,8 @@ td.text-ov {
 table.dataTable.no-footer {
   border-bottom: 0;
   overflow: hidden;
-  border-radius: 1.25rem; }
+  /* border-radius: 1.25rem;  */
+  }
 
 .rounded-lg {
   min-width: 1.875rem; }
