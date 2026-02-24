@@ -46,29 +46,20 @@ Route::prefix('{business:slug}/admin')
     ->name('business.')
     ->middleware(['auth', 'usertype:business_admin'])
     ->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Business\AdminController::class, 'index'])->name('dashboard');
+        Route::get('/settings', [App\Http\Controllers\Business\BusinessSettingsController::class, 'index'])->name('settings');
+        Route::put('/settings/general', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateGeneral'])->name('settings.general');
+        Route::put('/settings/appearance', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateAppearance'])->name('settings.appearance');
+        Route::post('/settings/remove-logo', [App\Http\Controllers\Business\BusinessSettingsController::class, 'removeLogo'])->name('settings.remove-logo');
         
-        // Settings Routes
-        Route::get('/settings', [App\Http\Controllers\Business\BusinessSettingsController::class, 'index'])
-            ->name('settings');
-        
-        Route::put('/settings/general', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateGeneral'])
-            ->name('settings.general');
-        
-        Route::put('/settings/appearance', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateAppearance'])
-            ->name('settings.appearance');
-        
-        Route::put('/settings/notifications', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateNotifications'])
-            ->name('settings.notifications');
-        
-        Route::put('/settings/invoice', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateInvoice'])
-            ->name('settings.invoice');
-        
-        Route::put('/settings/security', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateSecurity'])
-            ->name('settings.security');
-        
-        Route::post('/settings/remove-logo', [App\Http\Controllers\Business\BusinessSettingsController::class, 'removeLogo'])
-            ->name('settings.remove-logo');
+        // API endpoint for dynamic updates
+        Route::get('/settings/data', function($business) {
+            return response()->json([
+                'colors' => App\Helpers\BusinessSettingsHelper::getColors($business),
+                'font_family' => App\Helpers\BusinessSettingsHelper::get($business, 'font_family', 'Inter, sans-serif'),
+                'settings' => App\Helpers\BusinessSettingsHelper::getAll($business)
+            ]);
+        })->name('settings.data');
     });
 
 Route::middleware(['auth', 'usertype:employee'])

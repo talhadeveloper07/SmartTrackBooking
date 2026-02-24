@@ -1,6 +1,4 @@
 <?php
-// app/Services/BusinessSettingsService.php
-
 namespace App\Services;
 
 use App\Models\Business;
@@ -21,24 +19,6 @@ class BusinessSettingsService
         'font_family' => 'Inter, sans-serif',
         'logo_path' => null,
         'favicon_path' => null,
-        'email_notifications' => true,
-        'sms_notifications' => false,
-        'push_notifications' => false,
-        'notification_events' => ['new_order', 'new_customer', 'low_stock'],
-        'invoice_prefix' => 'INV-',
-        'invoice_logo_path' => null,
-        'invoice_footer' => 'Thank you for your business!',
-        'invoice_terms' => 'Payment is due within 30 days.',
-        'tax_rate' => 0,
-        'tax_name' => 'VAT',
-        'two_factor_auth' => false,
-        'session_timeout' => 30,
-        'password_expiry_days' => 90,
-        'email_header' => null,
-        'email_footer' => null,
-        'email_signature' => null,
-        'language' => 'en',
-        'country' => 'US',
     ];
 
     public function getSettings(Business $business): array
@@ -61,8 +41,8 @@ class BusinessSettingsService
         $business->settings = $updatedSettings;
         $business->save();
         
-        // Clear the cache after updating
-        BusinessSettingsHelper::clearCache($business);
+        BusinessSettingsHelper::clearRequestCache($business);
+        $business->touch();
         
         return $business;
     }
@@ -77,28 +57,5 @@ class BusinessSettingsService
     {
         $path = $this->getSetting($business, 'favicon_path');
         return $path ? asset('storage/' . $path) : null;
-    }
-
-    public function isEnabled(Business $business, string $key): bool
-    {
-        return (bool) $this->getSetting($business, $key, false);
-    }
-
-    public function getFormattedBusinessHours(Business $business): array
-    {
-        $hours = $business->business_hours ?? [];
-        $formatted = [];
-        
-        $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-        
-        foreach ($days as $day) {
-            if (isset($hours[$day]) && $hours[$day]['open'] && $hours[$day]['close']) {
-                $formatted[$day] = $hours[$day]['open'] . ' - ' . $hours[$day]['close'];
-            } else {
-                $formatted[$day] = 'Closed';
-            }
-        }
-        
-        return $formatted;
     }
 }

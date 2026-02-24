@@ -1,4 +1,3 @@
-{{-- resources/views/business/layouts/sidebar.blade.php --}}
 <div class="deznav">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
@@ -18,49 +17,16 @@
                 </a>
                 <ul aria-expanded="false">
                     <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#general">
-                            <i class="fas fa-cog me-2"></i>General Settings
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#appearance">
-                            <i class="fas fa-palette me-2"></i>Appearance
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#notifications">
-                            <i class="fas fa-bell me-2"></i>Notifications
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#invoice">
-                            <i class="fas fa-file-invoice me-2"></i>Invoice
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#security">
-                            <i class="fas fa-shield-alt me-2"></i>Security
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#email">
-                            <i class="fas fa-envelope me-2"></i>Email
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('business.settings', $business->slug) }}#localization">
-                            <i class="fas fa-globe me-2"></i>Localization
+                        <a href="{{ route('business.settings', $business->slug) }}">
+                            Settings
                         </a>
                     </li>
                 </ul>
             </li>
         </ul>
         
-        {{-- Business Info Box with Dynamic Colors --}}
-        @php
-            $colors = App\Helpers\BusinessSettingsHelper::getColors($business ?? null);
-        @endphp
-        <div class="plus-box" style="background: linear-gradient(135deg, {{ $colors['primary'] }} 0%, {{ $colors['secondary'] }} 100%);">
+        {{-- Business Info Box with Dynamic Colors using CSS variables --}}
+        <div class="plus-box" style="background: linear-gradient(135deg, var(--primary-color, #216FED) 0%, var(--secondary-color, #38c172) 100%);">
             <p class="fs-14 font-w600 mb-2 text-white">{{ $business->name ?? 'Business' }}<br>Manage your settings<br>and preferences</p>
             <a class="btn btn-light btn-sm fs-14" href="{{ route('business.settings', $business->slug) }}">Go to Settings</a>
         </div>
@@ -69,3 +35,23 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Dynamic sidebar active states */
+.metismenu .active > a {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.metismenu .active > a i {
+    color: white !important;
+}
+
+.metismenu a:hover {
+    color: var(--primary-color) !important;
+}
+
+.metismenu a:hover i {
+    color: var(--primary-color) !important;
+}
+</style>

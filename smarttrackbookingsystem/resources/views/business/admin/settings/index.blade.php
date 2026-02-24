@@ -14,262 +14,244 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-3 col-md-4 mb-4">
-            <!-- Settings Navigation -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Settings Menu</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="#general" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-cog me-2"></i> General
-                    </a>
-                    <a href="#appearance" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-palette me-2"></i> Appearance
-                    </a>
-                    <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-bell me-2"></i> Notifications
-                    </a>
-                    <a href="#invoice" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-file-invoice me-2"></i> Invoice
-                    </a>
-                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-shield-alt me-2"></i> Security
-                    </a>
-                    <a href="#email" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-envelope me-2"></i> Email
-                    </a>
-                    <a href="#localization" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                        <i class="fas fa-globe me-2"></i> Localization
-                    </a>
-                </div>
-            </div>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
 
-        <div class="col-lg-9 col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs" id="settingsTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">General</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="appearance-tab" data-bs-toggle="tab" data-bs-target="#appearance" type="button" role="tab">Appearance</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">Notifications</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="invoice-tab" data-bs-toggle="tab" data-bs-target="#invoice" type="button" role="tab">Invoice</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">Security</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab">Email</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="localization-tab" data-bs-toggle="tab" data-bs-target="#localization" type="button" role="tab">Localization</button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body">
-                    <div class="tab-content" id="settingsTabContent">
-                        {{-- General Settings Tab --}}
-                        @include('business.admin.settings.tabs.general', ['business' => $business, 'settings' => $settings])
-                        
-                        {{-- Appearance Settings Tab --}}
-                        @include('business.admin.settings.tabs.appearance', ['business' => $business, 'settings' => $settings])
-                        
-                        {{-- Notifications Settings Tab --}}
-                        @include('business.admin.settings.tabs.notifications', ['business' => $business, 'settings' => $settings])
-                        
-                        {{-- Invoice Settings Tab --}}
-                        @include('business.admin.settings.tabs.invoice', ['business' => $business, 'settings' => $settings])
-                        
-                        {{-- Security Settings Tab --}}
-                        @include('business.admin.settings.tabs.security', ['business' => $business, 'settings' => $settings])
-                        
+    {{-- General Settings --}}
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-cog me-2" style="color: var(--primary-color);"></i> General Settings
+            </h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('business.settings.general', $business->slug) }}" method="POST">
+                @csrf
+                @method('PUT')
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="business_name" class="form-label">Business Name</label>
+                        <input type="text" class="form-control @error('business_name') is-invalid @enderror" 
+                               id="business_name" name="business_name" 
+                               value="{{ old('business_name', $business->name) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="business_email" class="form-label">Business Email</label>
+                        <input type="email" class="form-control @error('business_email') is-invalid @enderror" 
+                               id="business_email" name="business_email" 
+                               value="{{ old('business_email', $business->email) }}">
                     </div>
                 </div>
-            </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="business_phone" class="form-label">Business Phone</label>
+                        <input type="text" class="form-control @error('business_phone') is-invalid @enderror" 
+                               id="business_phone" name="business_phone" 
+                               value="{{ old('business_phone', $business->phone) }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="timezone" class="form-label">Timezone</label>
+                        <select class="form-select" id="timezone" name="timezone">
+                            @foreach(timezone_identifiers_list() as $timezone)
+                                <option value="{{ $timezone }}" {{ ($settings['timezone'] ?? 'UTC') == $timezone ? 'selected' : '' }}>
+                                    {{ $timezone }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="business_address" class="form-label">Business Address</label>
+                    <textarea class="form-control" id="business_address" name="business_address" rows="3">{{ old('business_address', $business->address) }}</textarea>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="date_format" class="form-label">Date Format</label>
+                        <select class="form-select" id="date_format" name="date_format">
+                            <option value="Y-m-d" {{ ($settings['date_format'] ?? 'Y-m-d') == 'Y-m-d' ? 'selected' : '' }}>YYYY-MM-DD</option>
+                            <option value="m/d/Y" {{ ($settings['date_format'] ?? '') == 'm/d/Y' ? 'selected' : '' }}>MM/DD/YYYY</option>
+                            <option value="d/m/Y" {{ ($settings['date_format'] ?? '') == 'd/m/Y' ? 'selected' : '' }}>DD/MM/YYYY</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="time_format" class="form-label">Time Format</label>
+                        <select class="form-select" id="time_format" name="time_format">
+                            <option value="H:i" {{ ($settings['time_format'] ?? 'H:i') == 'H:i' ? 'selected' : '' }}>24 Hour</option>
+                            <option value="h:i A" {{ ($settings['time_format'] ?? '') == 'h:i A' ? 'selected' : '' }}>12 Hour</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="currency" class="form-label">Currency</label>
+                        <select class="form-select" id="currency" name="currency">
+                            <option value="USD" {{ ($settings['currency'] ?? 'USD') == 'USD' ? 'selected' : '' }}>USD ($)</option>
+                            <option value="EUR" {{ ($settings['currency'] ?? '') == 'EUR' ? 'selected' : '' }}>EUR (€)</option>
+                            <option value="GBP" {{ ($settings['currency'] ?? '') == 'GBP' ? 'selected' : '' }}>GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save General Settings</button>
+            </form>
+        </div>
+    </div>
+
+    {{-- Appearance Settings --}}
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-palette me-2" style="color: var(--primary-color);"></i> Appearance Settings
+            </h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('business.settings.appearance', $business->slug) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                
+                <h6 class="mb-3">Color Scheme</h6>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Primary Color</label>
+                        <div class="d-flex">
+                            <input type="color" class="form-control form-control-color me-2" 
+                                   id="primary_color_picker" 
+                                   value="{{ $settings['primary_color'] ?? '#110093' }}" 
+                                   style="width: 60px; height: 38px;">
+                            <input type="text" class="form-control" 
+                                   id="primary_color" name="primary_color" 
+                                   value="{{ old('primary_color', $settings['primary_color'] ?? '#110093') }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Secondary Color</label>
+                        <div class="d-flex">
+                            <input type="color" class="form-control form-control-color me-2" 
+                                   id="secondary_color_picker" 
+                                   value="{{ $settings['secondary_color'] ?? '#38c172' }}" 
+                                   style="width: 60px; height: 38px;">
+                            <input type="text" class="form-control" 
+                                   id="secondary_color" name="secondary_color" 
+                                   value="{{ old('secondary_color', $settings['secondary_color'] ?? '#38c172') }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Accent Color</label>
+                        <div class="d-flex">
+                            <input type="color" class="form-control form-control-color me-2" 
+                                   id="accent_color_picker" 
+                                   value="{{ $settings['accent_color'] ?? '#f6993f' }}" 
+                                   style="width: 60px; height: 38px;">
+                            <input type="text" class="form-control" 
+                                   id="accent_color" name="accent_color" 
+                                   value="{{ old('accent_color', $settings['accent_color'] ?? '#f6993f') }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <h6 class="mb-3">Logo & Favicon</h6>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Business Logo</label>
+                        <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                        
+                        @if(isset($settings['logo_path']) && $settings['logo_path'])
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/'.$settings['logo_path']) }}" alt="Logo" class="img-thumbnail" style="max-height: 100px;">
+                                <button type="button" class="btn btn-sm btn-danger mt-2 remove-logo" data-type="logo">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Favicon</label>
+                        <input type="file" class="form-control" id="favicon" name="favicon" accept=".ico,.png">
+                        
+                        @if(isset($settings['favicon_path']) && $settings['favicon_path'])
+                            <div class="mt-2">
+                                <img src="{{ asset('storage/'.$settings['favicon_path']) }}" alt="Favicon" class="img-thumbnail" style="max-height: 32px;">
+                                <button type="button" class="btn btn-sm btn-danger mt-2 remove-logo" data-type="favicon">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Appearance Settings</button>
+            </form>
         </div>
     </div>
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/3.4.0/css/bootstrap-colorpicker.min.css">
-<style>
-    .color-preview {
-        width: 40px;
-        height: 38px;
-        border-radius: 0 4px 4px 0;
-        border: 1px solid #ddd;
-        cursor: pointer;
-    }
-    .logo-preview {
-        max-width: 200px;
-        max-height: 100px;
-        margin-top: 10px;
-        object-fit: contain;
-    }
-    .favicon-preview {
-        width: 32px;
-        height: 32px;
-        margin-top: 10px;
-    }
-    .input-group .form-control {
-        border-right: none;
-    }
-    .input-group .form-control:focus {
-        border-right: none;
-        box-shadow: none;
-    }
-    .colorpicker-component {
-        cursor: pointer;
-    }
-</style>
-@endpush
-
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/3.4.0/js/bootstrap-colorpicker.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Initialize color pickers with dynamic updates
-        function initColorPicker(selector, defaultColor) {
-            $(selector).colorpicker({
-                format: 'hex',
-                color: defaultColor,
-                container: true,
-                inline: false
-            }).on('colorpickerChange', function(event) {
-                // Update the input value
-                $(this).find('input').val(event.color.toString());
-                // Update the preview span background
-                $(this).find('.color-preview').css('background-color', event.color.toString());
-            }).on('colorpickerCreate', function() {
-                // Initial setup
-                const input = $(this).find('input');
-                const preview = $(this).find('.color-preview');
-                preview.css('background-color', input.val());
+$(document).ready(function() {
+    // Sync color pickers with text inputs
+    $('#primary_color_picker, #secondary_color_picker, #accent_color_picker').on('input', function() {
+        $('#' + this.id.replace('_picker', '')).val(this.value);
+    });
+    
+    $('#primary_color, #secondary_color, #accent_color').on('input', function() {
+        $('#' + this.id + '_picker').val(this.value);
+    });
+
+    // Preview font selection
+    $('#font_family').on('change', function() {
+        const fontFamily = $(this).val();
+        // Apply temporarily to show preview
+        $('body').css('font-family', fontFamily);
+    });
+
+    // Handle form submission
+    $('form').on('submit', function() {
+        const form = $(this);
+        if (form.attr('action').includes('appearance')) {
+            setTimeout(function() {
+                if (typeof window.refreshSettings === 'function') {
+                    window.refreshSettings();
+                }
+                localStorage.setItem('settings_updated', Date.now());
+            }, 500);
+        }
+    });
+
+    // Handle logo removal
+    $('.remove-logo').click(function() {
+        const type = $(this).data('type');
+        const button = $(this);
+        
+        if (confirm('Remove ' + type + '?')) {
+            $.ajax({
+                url: '{{ route("business.settings.remove-logo", $business->slug) }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    type: type
+                },
+                success: function() {
+                    button.closest('div').fadeOut();
+                    localStorage.setItem('settings_updated', Date.now());
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }
             });
         }
-
-        // Initialize each color picker with its current value
-        @if(isset($settings['primary_color']))
-            initColorPicker('#primary_color_picker', '{{ $settings['primary_color'] }}');
-        @endif
-        
-        @if(isset($settings['secondary_color']))
-            initColorPicker('#secondary_color_picker', '{{ $settings['secondary_color'] }}');
-        @endif
-        
-        @if(isset($settings['accent_color']))
-            initColorPicker('#accent_color_picker', '{{ $settings['accent_color'] }}');
-        @endif
-
-        // Handle logo removal with better error handling
-        $('.remove-logo').click(function() {
-            const type = $(this).data('type');
-            const button = $(this);
-            
-            if (confirm('Are you sure you want to remove the ' + type + '?')) {
-                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Removing...');
-                
-                $.ajax({
-                    url: '{{ route("business.settings.remove-logo", $business->slug) }}',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        type: type
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $(`.${type}-preview-container`).fadeOut(300, function() {
-                                $(this).remove();
-                            });
-                            
-                            // Show success message
-                            if (typeof toastr !== 'undefined') {
-                                toastr.success(type.charAt(0).toUpperCase() + type.slice(1) + ' removed successfully');
-                            } else {
-                                alert(type.charAt(0).toUpperCase() + type.slice(1) + ' removed successfully');
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'Error removing ' + type;
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                        alert(errorMessage);
-                    },
-                    complete: function() {
-                        button.prop('disabled', false).html('<i class="fas fa-trash"></i> Remove ' + type.charAt(0).toUpperCase() + type.slice(1));
-                    }
-                });
-            }
-        });
-
-        // Preview uploaded image with better handling
-        $('input[type="file"]').change(function(e) {
-            const file = this.files[0];
-            if (!file) return;
-            
-            // Validate file size (2MB max)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('File size must be less than 2MB');
-                $(this).val('');
-                return;
-            }
-            
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/x-icon'];
-            if (!validTypes.includes(file.type) && !file.name.match(/\.(ico)$/i)) {
-                alert('Invalid file type. Please upload an image file.');
-                $(this).val('');
-                return;
-            }
-            
-            const reader = new FileReader();
-            const previewId = $(this).data('preview');
-            const previewContainer = $(previewId).closest('.logo-preview-container, .favicon-preview-container');
-            
-            reader.onload = function(e) {
-                $(previewId).attr('src', e.target.result).show();
-                previewContainer.removeClass('d-none');
-            }
-            
-            reader.readAsDataURL(file);
-        });
-
-        // Handle tab navigation from sidebar links
-        $('.list-group-item[data-bs-toggle="tab"]').on('click', function(e) {
-            e.preventDefault();
-            const target = $(this).attr('href');
-            
-            // Activate the corresponding tab
-            $(`button[data-bs-target="${target}"]`).tab('show');
-            
-            // Update URL hash without scrolling
-            history.pushState(null, null, target);
-        });
-
-        // Check if there's a hash in URL and activate that tab
-        if (window.location.hash) {
-            const hash = window.location.hash;
-            const tab = $(`button[data-bs-target="${hash}"]`);
-            if (tab.length) {
-                tab.tab('show');
-            }
-        }
-
-        // Fix for colorpicker positioning
-        $(document).on('colorpickerShow', function(e) {
-            $(e.target).css('z-index', 9999);
-        });
     });
+});
 </script>
 @endpush

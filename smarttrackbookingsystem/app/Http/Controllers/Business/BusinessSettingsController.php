@@ -1,11 +1,10 @@
 <?php
-// app/Http/Controllers/Business/BusinessSettingsController.php
-
 namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Services\BusinessSettingsService;
+use App\Helpers\BusinessSettingsHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,22 +17,13 @@ class BusinessSettingsController extends Controller
         $this->settingsService = $settingsService;
     }
 
-    /**
-     * Show settings page
-     */
     public function index(Business $business)
     {
-        // Verify that the authenticated user is admin of this business
         $this->authorize('update', $business);
-        
         $settings = $this->settingsService->getSettings($business);
-        
         return view('business.admin.settings.index', compact('business', 'settings'));
     }
 
-    /**
-     * Update general settings
-     */
     public function updateGeneral(Request $request, Business $business)
     {
         $this->authorize('update', $business);
@@ -45,18 +35,34 @@ class BusinessSettingsController extends Controller
             'business_address' => 'sometimes|string|max:500',
             'timezone' => 'sometimes|string|max:100',
             'date_format' => 'sometimes|string|max:20',
+            'time_format' => 'sometimes|string|max:20',
             'currency' => 'sometimes|string|max:10',
+            'week_start' => 'sometimes|string|max:10',
         ]);
 
-        $this->settingsService->updateSettings($business, $validated);
+        // Update business model fields
+        if (isset($validated['business_name'])) {
+            $business->name = $validated['business_name'];
+        }
+        if (isset($validated['business_email'])) {
+            $business->email = $validated['business_email'];
+        }
+        if (isset($validated['business_phone'])) {
+            $business->phone = $validated['business_phone'];
+        }
+        if (isset($validated['business_address'])) {
+            $business->address = $validated['business_address'];
+        }
+        $business->save();
+
+        // Update settings
+        $settingsData = array_diff_key($validated, array_flip(['business_name', 'business_email', 'business_phone', 'business_address']));
+        $this->settingsService->updateSettings($business, $settingsData);
 
         return redirect()->route('business.settings', $business->slug)
             ->with('success', 'General settings updated successfully.');
     }
 
-    /**
-     * Update appearance settings (colors, logo)
-     */
     public function updateAppearance(Request $request, Business $business)
     {
         $this->authorize('update', $business);
@@ -75,7 +81,6 @@ class BusinessSettingsController extends Controller
             $path = $request->file('logo')->store('business-logos', 'public');
             $validated['logo_path'] = $path;
             
-            // Delete old logo if exists
             $oldSettings = $this->settingsService->getSettings($business);
             if (!empty($oldSettings['logo_path'])) {
                 Storage::disk('public')->delete($oldSettings['logo_path']);
@@ -87,7 +92,6 @@ class BusinessSettingsController extends Controller
             $path = $request->file('favicon')->store('business-favicons', 'public');
             $validated['favicon_path'] = $path;
             
-            // Delete old favicon if exists
             $oldSettings = $this->settingsService->getSettings($business);
             if (!empty($oldSettings['favicon_path'])) {
                 Storage::disk('public')->delete($oldSettings['favicon_path']);
@@ -100,69 +104,11 @@ class BusinessSettingsController extends Controller
             ->with('success', 'Appearance settings updated successfully.');
     }
 
-    /**
-     * Update notification settings
-     */
-    public function updateNotifications(Request $request, Business $business)
-    {
-        $this->authorize('update', $business);
-
-        $validated = $request->validate([
-            'email_notifications' => 'sometimes|boolean',
-            'sms_notifications' => 'sometimes|boolean',
-            'push_notifications' => 'sometimes|boolean',
-            'notification_events' => 'sometimes|array',
-        ]);
-
-        $this->settingsService->updateSettings($business, $validated);
-
-        return redirect()->route('business.settings', $business->slug)
-            ->with('success', 'Notification settings updated successfully.');
-    }
-
-    /**
-     * Update invoice settings
-     */
-    public function updateInvoice(Request $request, Business $business)
-    {
-        $this->authorize('update', $business);
-
-        $validated = $request->validate([
-            'invoice_prefix' => 'sometimes|string|max:20',
-            'invoice_logo' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
-            'invoice_footer' => 'sometimes|string|max:500',
-            'invoice_terms' => 'sometimes|string|max:1000',
-            'tax_rate' => 'sometimes|numeric|min:0|max:100',
-            'tax_name' => 'sometimes|string|max:50',
-        ]);
-
-        // Handle invoice logo upload
-        if ($request->hasFile('invoice_logo')) {
-            $path = $request->file('invoice_logo')->store('business-invoice-logos', 'public');
-            $validated['invoice_logo_path'] = $path;
-            
-            // Delete old invoice logo if exists
-            $oldSettings = $this->settingsService->getSettings($business);
-            if (!empty($oldSettings['invoice_logo_path'])) {
-                Storage::disk('public')->delete($oldSettings['invoice_logo_path']);
-            }
-        }
-
-        $this->settingsService->updateSettings($business, $validated);
-
-        return redirect()->route('business.settings', $business->slug)
-            ->with('success', 'Invoice settings updated successfully.');
-    }
-
-    /**
-     * Remove logo
-     */
     public function removeLogo(Request $request, Business $business)
     {
         $this->authorize('update', $business);
 
-        $type = $request->input('type', 'logo'); // logo, favicon, invoice_logo
-        
+        $type = $request->input('type', 'logo');
         $settings = $this->settingsService->getSettings($business);
         
         $pathKey = $type . '_path';
@@ -172,6 +118,9 @@ class BusinessSettingsController extends Controller
             
             $business->settings = $settings;
             $business->save();
+            
+            BusinessSettingsHelper::clearRequestCache($business);
+            $business->touch();
         }
 
         return response()->json(['success' => true]);
