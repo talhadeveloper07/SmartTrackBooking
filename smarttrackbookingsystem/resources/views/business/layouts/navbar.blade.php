@@ -24,3 +24,17 @@
         </div>
     </div>
 </div>
+
+            <a href="index.html" class="brand-logo">
+				<img src="{{ asset('storage/' . $business->logo) }}" class="logo-abbr" width="64" height="64">
+				<div class="brand-title" width="108" height="44">
+					{{ $business->name }}
+				</div>
+            </a>
+            <div class="nav-control">
+                <div class="hamburger">
+                    <span class="line"></span><span class="line"></span><span class="line"></span>
+                </div>
+            </div>
+        </div>
+

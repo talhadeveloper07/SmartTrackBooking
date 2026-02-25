@@ -38,4 +38,15 @@ class Employee extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function services()
+{
+    return $this->belongsToMany(\App\Models\Service::class, 'employee_services')
+        ->withPivot('status')
+        ->withTimestamps();
+}
+
+public function workingHours()
+{
+    return $this->hasMany(\App\Models\EmployeeWorkingHour::class);
+}
 }

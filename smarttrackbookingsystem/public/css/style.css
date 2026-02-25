@@ -10480,7 +10480,7 @@ div, span, ol, ul {
   .nav-header .brand-title {
     margin-left: 0.9375rem;
     max-width: 8.75rem;
-    font-size: 2.375rem;
+    font-size: 1rem;
     color: #000; }
     [data-theme-version="dark"] .nav-header .brand-title {
       background-position: 0 120%; }
@@ -31718,3 +31718,100 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
       color: #fff; }
 
 /*# sourceMappingURL=style.css.map */
+
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; transition: .2s; border-radius: 999px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; top: 3px; background: white; transition: .2s; border-radius: 999px; }
+.switch input:checked + .slider { background: #3b82f6; }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+
+.day-name { font-weight: 600; font-size: 16px; }
+.day-off { color: #ef4444; text-decoration: line-through; opacity: .8; }
+
+.ampm-toggle { display: inline-flex; gap: 6px; background: #f3f4f6; border-radius: 999px; padding: 4px; }
+.ampm-toggle .ampm-btn { border: 0; background: transparent; border-radius: 999px; padding: 4px 10px; font-weight: 600; }
+.ampm-toggle .ampm-btn.active { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+.time-text { font-weight: 600; }
+
+
+.service-list{
+    display:flex;
+    gap:14px;
+    flex-wrap: wrap;
+}
+.service-item{
+    position:relative;
+}
+.service-check{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+/* pill */
+.service-pill{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    border:1px solid #737b8b17;
+    border-radius:999px;
+    padding:11px 15px;
+    cursor:pointer;
+    user-select:none;
+    background:#fff;
+}
+
+/* left icons */
+.service-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.service-tick{
+    width:25px;
+    height:25px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#2f7cff;
+    color:#fff;
+    font-size:14px;
+    opacity:0;           /* hidden when unchecked */
+    transform:scale(.9);
+    transition:.15s;
+}
+.service-icon{
+    width:36px;
+    height:36px;
+    border-radius:999px;
+    background:#eef2f7;  /* light icon placeholder */
+    position:relative;
+}
+.service-icon:before,
+.service-icon:after{
+    content:"";
+    position:absolute;
+    background:#d9e2ef;
+    border-radius:999px;
+}
+.service-icon:before{
+    width:18px;height:10px;left:6px;top:8px;transform:rotate(-25deg);
+}
+.service-icon:after{
+    width:18px;height:10px;right:6px;bottom:8px;transform:rotate(25deg);
+}
+
+.service-name{
+    font-size:15px;
+    font-weight:600;
+    color:#111827;
+}
+
+/* checked state */
+.service-check:checked + .service-pill .service-tick{
+    opacity:1;
+    transform:scale(1);
+}

@@ -23,6 +23,10 @@
             echo '<link href="https://fonts.googleapis.com/css2?family=' . $fontName . ':wght@300;400;500;600;700&display=swap" rel="stylesheet">';
         }
     @endphp
+        	<link href="/vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+	<link rel="stylesheet" href="/vendor/dotted-map/css/contrib/jquery.smallipop-0.3.0.min.css" type="text/css" media="all">
+      <link href="/css/style.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <style id="dynamic-styles">
         :root {
@@ -133,6 +137,7 @@
     <script src="/vendor/global/global.min.js"></script>
     <script src="/vendor/jquery-nice-select/js/jquery.nice-select.min.js"></script>
     <script src="/js/custom.min.js"></script>
+<<<<<<< Updated upstream
     <script src="/js/deznav-init.js"></script>
     
     <script>
@@ -196,3 +201,10 @@
     @stack('scripts')
 </body>
 </html>
+=======
+	<script src="/js/deznav-init.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+</html>
+>>>>>>> Stashed changes
