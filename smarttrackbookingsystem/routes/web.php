@@ -44,12 +44,23 @@ Route::middleware(['auth', 'usertype:org_admin'])
 
 Route::prefix('{business:slug}/admin')
     ->name('business.')
-    ->middleware(['auth','usertype:business_admin'])
+    ->middleware(['auth', 'usertype:business_admin'])
     ->group(function () {
-
-        Route::get('/dashboard',[AdminController::class,'index'])->name('dashboard');
-
-});
+        Route::get('/dashboard', [App\Http\Controllers\Business\AdminController::class, 'index'])->name('dashboard');
+        Route::get('/settings', [App\Http\Controllers\Business\BusinessSettingsController::class, 'index'])->name('settings');
+        Route::put('/settings/general', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateGeneral'])->name('settings.general');
+        Route::put('/settings/appearance', [App\Http\Controllers\Business\BusinessSettingsController::class, 'updateAppearance'])->name('settings.appearance');
+        Route::post('/settings/remove-logo', [App\Http\Controllers\Business\BusinessSettingsController::class, 'removeLogo'])->name('settings.remove-logo');
+        
+        // API endpoint for dynamic updates
+        Route::get('/settings/data', function($business) {
+            return response()->json([
+                'colors' => App\Helpers\BusinessSettingsHelper::getColors($business),
+                'font_family' => App\Helpers\BusinessSettingsHelper::get($business, 'font_family', 'Inter, sans-serif'),
+                'settings' => App\Helpers\BusinessSettingsHelper::getAll($business)
+            ]);
+        })->name('settings.data');
+    });
 
 Route::middleware(['auth', 'usertype:employee'])
     ->get('/employee/dashboard', fn () => view('business.employee.dashboard'))
