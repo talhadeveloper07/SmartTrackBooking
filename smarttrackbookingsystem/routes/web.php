@@ -41,13 +41,6 @@ Route::middleware(['auth', 'usertype:org_admin'])
 
 });
 
-Route::prefix('{business:slug}/admin')
-    ->name('business.')
-    ->middleware(['auth','usertype:business_admin'])
-    ->group(function () {
-
-        Route::get('/dashboard',[AdminController::class,'index'])->name('dashboard');
-});
 
 Route::middleware(['auth', 'usertype:employee'])
     ->get('/employee/dashboard', fn () => view('business.employee.dashboard'))
