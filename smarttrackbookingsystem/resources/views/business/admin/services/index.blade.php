@@ -1,98 +1,150 @@
 @extends('business.layouts.app')
 
 @section('business_content')
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <div class="d-flex align-items-center mb-3">
-         @if(session('success'))
-            <script>
-                toastr.success("{{ session('success') }}");
-            </script>
-        @endif
+        <div class="d-flex align-items-center mb-3">
+            @if(session('success'))
+                <script>
+                    toastr.success("{{ session('success') }}");
+                </script>
+            @endif
 
-        @if(session('error'))
-            <script>
-                toastr.error("{{ session('error') }}");
-            </script>
-        @endif
+            @if(session('error'))
+                <script>
+                    toastr.error("{{ session('error') }}");
+                </script>
+            @endif
 
-        <h3 class="me-auto">Services</h3>
+            <h3 class="me-auto">Services</h3>
+        </div>
 
-        <a href="{{ route('business.add.service', $business->slug) }}" class="btn btn-primary">
-            Add Service
-        </a>
-    </div>
+        <div class="row g-4 pb-5">
 
-    <div class="row g-4">
-        @forelse($services as $service)
 
-            @php
-                $defaultDuration = $service->durations->first(); // smallest duration
-                $durationText = $defaultDuration ? $defaultDuration->duration_minutes.' min' : '-';
-                $priceText = $defaultDuration ? '$'.number_format($defaultDuration->price, 2) : '-';
-                $agentsText = '—'; // later when you add agents
-            @endphp
+            {{-- EXISTING SERVICES --}}
+            @forelse($services as $service)
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="service-card card h-100">
+                        <div class="card-body p-0">
+                            @php
+                                $durs = $service->durations ?? collect();
 
-                    <div class="p-4 border-bottom bg-white">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <h5 class="mb-0">{{ ucwords($service->name) }}</h5>
-                        </div>
-                    </div>
+                                // durations (minutes)
+                                $mins = $durs->pluck('duration_minutes')->filter()->map(fn($v) => (int) $v);
+                                $durCount = $mins->count();
+                                $minDuration = $durCount ? $mins->min() : null;
+                                $maxDuration = $durCount ? $mins->max() : null;
 
-                    <div class="p-4">
-                        {{-- Agents icon placeholder like screenshot --}}
-                        <div class="d-flex align-items-center justify-content-center py-3">
-                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
-                                 style="width:52px;height:52px;">
-                                <i class="fa fa-user text-muted"></i>
+                                // prices per duration (CHANGE 'price' if your column name is different)
+                                $prices = $durs->pluck('price')->filter()->map(fn($v) => (float) $v);
+                                $priceCount = $prices->count();
+                                $minPrice = $priceCount ? $prices->min() : null;
+                                $maxPrice = $priceCount ? $prices->max() : null;
+
+                                // fallback service price
+                                $singlePrice = $service->price ?? null;
+                            @endphp
+
+                            {{-- Header --}}
+                            <div class="p-4 pb-3">
+                                <h4 class="service-title mb-0">
+                                    {{ $service->name }}
+                                    <span class="text-muted fw-normal">
+                                        (
+                                        @if($durCount > 1)
+                                            {{ $minDuration }}-{{ $maxDuration }} min
+                                        @elseif($durCount === 1)
+                                            {{ $minDuration }} min
+                                        @elseif($singleDuration)
+                                            {{ $singleDuration }} min
+                                        @else
+                                            —
+                                        @endif
+                                        )
+                                    </span>
+                                </h4>
                             </div>
-                        </div>
 
-                        <div class="row small text-muted">
-                            <div class="col-6 mb-2">Agents:</div>
-                            <div class="col-6 mb-2 text-end fw-semibold text-dark">{{ $agentsText }}</div>
+                            <hr class="m-0">
 
-                            <div class="col-6 mb-2">Duration:</div>
-                            <div class="col-6 mb-2 text-end fw-semibold text-dark">{{ $durationText }}</div>
+                            {{-- Agents placeholder (optional) --}}
+                            <div class="agent-area d-flex align-items-center justify-content-center">
+                                <div class="agent-icon">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
 
-                            <div class="col-6 mb-2">Price:</div>
-                            <div class="col-6 mb-2 text-end fw-semibold text-dark">{{ $priceText }}</div>
+                            <hr class="m-0">
+
+                            {{-- Details --}}
+                            <div class="p-4 pt-3">
+
+                                <div class="detail-row d-flex justify-content-between">
+                                    <div class="text-start">Duration:</div>
+                                    <div class="value">
+                                        @if($durCount > 1)
+                                            {{ $minDuration }} - {{ $maxDuration }} min
+                                        @elseif($durCount === 1)
+                                            {{ $minDuration }} min
+                                        @elseif($singleDuration)
+                                            {{ $singleDuration }} min
+                                        @else
+                                            —
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="detail-row d-flex justify-content-between">
+                                    <div class="text-start">Price:</div>
+                                    <div class="value">
+                                        @if($priceCount > 1 && $minPrice != $maxPrice)
+                                            ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
+                                        @elseif($priceCount === 1)
+                                            ${{ number_format($minPrice, 2) }}
+                                        @elseif(!is_null($singlePrice))
+                                            ${{ number_format((float) $singlePrice, 2) }}
+                                        @else
+                                            —
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="detail-row d-flex justify-content-between">
+                                    <div class="text-start">Assigned to:</div>
+                                    <div class="value">{{ $service->employees_count ?? 0 }} employees</div>
+                                </div>
+                            </div>
+
+                            {{-- Footer --}}
+                            <div class="p-3 pt-0">
+                                <a href="{{ route('business.services.edit', [$business->slug, $service->id]) }}"
+                                    class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold">
+                                    <i class="fa fa-pen me-2"></i>
+                                    Edit Service
+                                </a>
+                            </div>
 
                         </div>
                     </div>
-
-                    <div class="px-3">
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('business.services.edit', [$business->slug, $service->id]) }}"
-                               class="btn btn-outline-primary w-100 rounded-3">
-                                <i class="fa fa-pen me-2"></i> Edit Service
-                            </a>
-
-                            <!-- <form action="{{ route('business.services.destroy', [$business->slug, $service->id]) }}"
-                                  method="POST" class="w-100">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="btn btn-outline-danger w-100 rounded-3"
-                                        onclick="return confirm('Delete this service?')">
-                                    <i class="fa fa-trash me-2"></i> Delete
-                                </button>
-                            </form> -->
-                        </div>
-                    </div>
-
                 </div>
+            @empty
+                {{-- If no services, still show "New Service" tile below --}}
+            @endforelse
+
+            {{-- NEW SERVICE TILE --}}
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ route('business.add.service', $business->slug) }}" class="new-service-tile h-100">
+                    <div class="new-service-inner">
+                        <div class="plus-wrap">
+                            <span class="plus">+</span>
+                        </div>
+                        <div class="new-text">New Service</div>
+                    </div>
+                </a>
             </div>
 
-        @empty
-            <div class="col-12">
-                <div class="alert alert-info">No services found.</div>
-            </div>
-        @endforelse
+        </div>
+
     </div>
-
-</div>
 @endsection

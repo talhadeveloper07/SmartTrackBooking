@@ -31,7 +31,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Employee ID</th>
+                                    <th>Emp ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>

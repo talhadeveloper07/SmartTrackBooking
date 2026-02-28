@@ -31816,3 +31816,104 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
     transform:scale(1);
 }
 
+
+ /* Card look like screenshot */
+    .service-card{
+        border-radius: 18px;
+        border: 1px solid rgba(0,0,0,.08);
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+    .service-title{
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+    .agent-area{
+        height: 140px;
+        background: radial-gradient(circle, rgba(0,0,0,.03) 0%, rgba(0,0,0,0) 60%);
+    }
+    .agent-icon{
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(0,0,0,.06);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(0,0,0,.35);
+        font-size: 22px;
+    }
+
+    .detail-row{
+        gap: 14px;
+        margin: 10px 0;
+        font-size: 15px;
+    }
+    .detail-row .label{
+        width: 95px;
+        color: rgba(0,0,0,.40);
+        font-weight: 600;
+    }
+    .detail-row .value{
+        color: rgba(0,0,0,.75);
+        font-weight: 700;
+    }
+
+    /* New service tile */
+    .new-service-tile{
+        display: block;
+        border-radius: 18px;
+        border: 2px dotted rgba(0,0,0,.18);
+        background: rgba(0,0,0,.01);
+        text-decoration: none;
+        position: relative;
+        min-height: 360px; /* keeps consistent height */
+        transition: all .15s ease-in-out;
+    }
+    .new-service-tile:hover{
+        transform: translateY(-2px);
+        border-color: rgba(0,0,0,.28);
+        background: rgba(0,0,0,.02);
+    }
+    .new-service-inner{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 30px;
+    }
+    .plus-wrap{
+        width: 86px;
+        height: 86px;
+        border-radius: 50%;
+        background: rgba(0,0,0,.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .plus{
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--primary, #0d6efd);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+        line-height: 1;
+        font-weight: 700;
+    }
+    .new-text{
+        font-size: 28px;
+        font-weight: 800;
+        color: rgba(0,0,0,.80);
+    }
+
+    /* Make card heights match better on small screens */
+    @media (max-width: 575px){
+        .new-service-tile{ min-height: 260px; }
+        .new-text{ font-size: 22px; }
+    }

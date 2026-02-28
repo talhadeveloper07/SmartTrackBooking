@@ -14,7 +14,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('redirect.home');
 
 
 Route::middleware(['auth', 'usertype:org_admin'])
@@ -38,6 +38,13 @@ Route::middleware(['auth', 'usertype:org_admin'])
         Route::get('/businesses/{business:slug}/admins/create', [BusinessAdminController::class,'create'])->name('business.admins.create');
         Route::post('/businesses/{business:slug}/admins', [BusinessAdminController::class,'store'])->name('business.admins.store');
         
+        // SETTINGS
+        Route::get('/settings', [OrganizationController::class, 'edit'])
+            ->name('settings.edit');
+
+        Route::put('/settings', [OrganizationController::class, 'update'])
+            ->name('settings.update');
+
 
 });
 
