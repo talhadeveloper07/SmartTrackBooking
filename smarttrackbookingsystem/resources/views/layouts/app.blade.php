@@ -18,6 +18,8 @@
         	<link href="/vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
 	<link rel="stylesheet" href="/vendor/dotted-map/css/contrib/jquery.smallipop-0.3.0.min.css" type="text/css" media="all">
       <link href="/css/style.css" rel="stylesheet">
+      <link href="/css/home.css" rel="stylesheet">
+
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
