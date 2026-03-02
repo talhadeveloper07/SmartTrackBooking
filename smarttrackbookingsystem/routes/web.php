@@ -6,6 +6,7 @@ use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Organization\BusinessController;
 use App\Http\Controllers\Organization\BusinessAdminController;
 use App\Http\Controllers\Business\AdminController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Str;
 
 Route::get('/', function () {
@@ -14,8 +15,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('redirect.home');
 
+Route::get('/global-search', [SearchController::class, 'ajaxSearch'])->name('global.search.ajax');
 
 Route::middleware(['auth', 'usertype:org_admin'])
     ->prefix('org')        // adds /org before all URLs
@@ -38,16 +40,16 @@ Route::middleware(['auth', 'usertype:org_admin'])
         Route::get('/businesses/{business:slug}/admins/create', [BusinessAdminController::class,'create'])->name('business.admins.create');
         Route::post('/businesses/{business:slug}/admins', [BusinessAdminController::class,'store'])->name('business.admins.store');
         
+        // SETTINGS
+        Route::get('/settings', [OrganizationController::class, 'edit'])
+            ->name('settings.edit');
+
+        Route::put('/settings', [OrganizationController::class, 'update'])
+            ->name('settings.update');
+
 
 });
 
-Route::prefix('{business:slug}/admin')
-    ->name('business.')
-    ->middleware(['auth','usertype:business_admin'])
-    ->group(function () {
-
-        Route::get('/dashboard',[AdminController::class,'index'])->name('dashboard');
-});
 
 Route::middleware(['auth', 'usertype:employee'])
     ->get('/employee/dashboard', fn () => view('business.employee.dashboard'))

@@ -60,4 +60,9 @@ class Business extends Model
     {
         return 'slug';
     }
+
+    public function dashboardSetting()
+    {
+        return $this->morphOne(DashboardSetting::class, 'owner');
+    }
 }

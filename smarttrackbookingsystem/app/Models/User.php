@@ -52,5 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\BusinessAdmin::class);
     }
+    public function customerProfile()
+    {
+        return $this->hasOne(\App\Models\Customer::class);
+    }
 
 }

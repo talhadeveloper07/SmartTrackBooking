@@ -15,6 +15,12 @@
 							<li><a href="{{ route('org.add-new-business') }}">Add new account</a></li>
                         </ul>
                     </li>
+                    <li>
+    <a href="{{ route('org.settings.edit') }}">
+        <i class="flaticon-017-clipboard"></i>
+        <span class="nav-text">Settings</span>
+    </a>
+</li>
                 </ul>
 			</div>
         </div>
