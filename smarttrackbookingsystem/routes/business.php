@@ -5,6 +5,7 @@ use App\Http\Controllers\Business\AdminController;
 use App\Http\Controllers\Business\ServiceController;
 use App\Http\Controllers\Business\EmployeeController;
 use App\Http\Controllers\Business\CustomerController;
+use App\Http\Controllers\Business\AppointmentController;
 
 Route::prefix('{business:slug}/admin')
     ->name('business.')
@@ -56,5 +57,26 @@ Route::prefix('{business:slug}/admin')
         Route::put('/profile', [AdminController::class, 'update_profile'])->name('profile.update');
         Route::post('/profile/password/email', [AdminController::class, 'sendPasswordResetLink'])
             ->name('profile.password.email');
+
+        // Appointment routes
+        Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+        Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
+        Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+       Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])
+            ->whereNumber('appointment')
+            ->name('appointments.show');
+
+        Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
+            ->whereNumber('appointment')
+            ->name('appointments.cancel');
+
+        // Appointment AJAX
+        Route::get('/appointments/service/{service}', [AppointmentController::class, 'serviceDetails'])
+            ->name('appointments.service.details');
+
+        Route::get('/appointments/available-slots', [AppointmentController::class, 'availableSlots'])
+            ->name('appointments.available.slots');
+        Route::get('/appointments/data', [AppointmentController::class, 'data'])->name('appointments.data');
+
 
 });

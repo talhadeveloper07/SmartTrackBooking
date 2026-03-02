@@ -35,6 +35,15 @@
             </li>
              <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
                     <i class="flaticon-024-dashboard"></i>
+                    <span class="nav-text">Appointments</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="{{ route('business.appointments.index', $business->slug) }}">All Appointments</a></li>
+                    <li><a href="{{ route('business.appointments.create', $business->slug) }}">Add New</a></li>
+                </ul>
+            </li>
+             <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
+                    <i class="flaticon-024-dashboard"></i>
                     <span class="nav-text">Settings</span>
                 </a>
                 <ul aria-expanded="false">

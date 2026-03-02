@@ -5,8 +5,10 @@
                         <div class="header-left">
 							<div class="nav-item">
 								<div class="input-group search-area">
-									<input type="text" class="form-control" placeholder="Search here">
-									<span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
+									<input  type="text" id="global-search" class="form-control" placeholder="Search anything..." autocomplete="off">
+									<div class="position-relative">
+										<div id="search-dropdown" class="search-dropdown d-none"></div>
+									</div>
 								</div>
 							</div>
                         </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\Organization\BusinessController;
 use App\Http\Controllers\Organization\BusinessAdminController;
 use App\Http\Controllers\Business\AdminController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Str;
 
 Route::get('/', function () {
@@ -16,6 +17,7 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('redirect.home');
 
+Route::get('/global-search', [SearchController::class, 'ajaxSearch'])->name('global.search.ajax');
 
 Route::middleware(['auth', 'usertype:org_admin'])
     ->prefix('org')        // adds /org before all URLs

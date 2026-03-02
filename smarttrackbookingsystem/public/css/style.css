@@ -31917,3 +31917,29 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
         .new-service-tile{ min-height: 260px; }
         .new-text{ font-size: 22px; }
     }
+
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 9999;
+    padding: 10px;
+}
+
+.search-section {
+    margin-bottom: 10px;
+}
+
+.search-item {
+    padding: 6px;
+    cursor: pointer;
+}
+
+.search-item:hover {
+    background: #f5f5f5;
+}

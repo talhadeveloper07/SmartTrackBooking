@@ -110,5 +110,86 @@
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+		<script>
+let debounceTimer;
+
+$('#global-search').on('keyup', function() {
+
+    let query = $(this).val();
+
+    clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(function() {
+
+        if (query.length < 1) {
+           $('#search-dropdown').html(html).removeClass('d-none').css('display', 'block');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('global.search.ajax') }}",
+            type: "GET",
+            data: { q: query },
+            success: function(response) {
+
+                let html = '';
+
+                // Appointments
+                if (response.appointments.length) {
+                    html += '<div class="search-section"><strong>Appointments</strong>';
+                  response.appointments.forEach(item => {
+    html += `<div class="search-item">
+                Appointment #${item.id} - ${item.appointment_date}
+            </div>`;
+});
+                    html += '</div>';
+                }
+
+                // Customers
+                if (response.customer.length) {
+                    html += '<div class="search-section"><strong>Customers</strong>';
+                    response.customer.forEach(item => {
+                        html += `<div class="search-item">
+                                    ${item.user.name} <!-- assuming your API returns 'user' relation -->
+                                </div>`;
+                    });
+                    html += '</div>';
+                }
+
+                // Agents
+                if (response.employee.length) {
+                    html += '<div class="search-section"><strong>Agents</strong>';
+                    response.employee.forEach(item => {
+                        html += `<div class="search-item">
+                                    ${item.name}
+                                </div>`;
+                    });
+                    html += '</div>';
+                }
+
+                // Services
+                if (response.service.length) {
+                    html += '<div class="search-section"><strong>Services</strong>';
+                    response.service.forEach(item => {
+                        html += `<div class="search-item">
+                                    ${item.name}
+                                </div>`;
+                    });
+                    html += '</div>';
+                }
+
+                if (html === '') {
+                    html = '<div class="search-item text-muted">No results found</div>';
+                }
+
+                $('#search-dropdown').html(html).removeClass('d-none');
+            }
+        });
+
+    }, 300); // debounce 300ms
+
+});
+</script>
 </html>
 

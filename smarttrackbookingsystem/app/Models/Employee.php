@@ -26,7 +26,8 @@ class Employee extends Model
 
     protected $casts = [
         'date_of_birth' => 'date',
-        'joining_date' => 'date'
+        'joining_date' => 'date',
+        'hours' => 'array'
     ];
 
     public function business()
