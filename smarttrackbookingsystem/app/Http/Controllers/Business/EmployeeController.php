@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Business;
 use App\Models\Employee;
+use App\Models\AppointmentItem;
+use Carbon\Carbon;
 use App\Models\Service;
 use DataTables;
 use App\Services\Business\Employee\EmployeeService;
@@ -93,23 +95,86 @@ class EmployeeController extends Controller
         }
     }
 
-    public function show_employee(Business $business, Employee $employee)
-    {
-        // security: employee must belong to this business
-        abort_if($employee->business_id !== $business->id, 404);
 
-        $employee->load([
-            'user',
-            'services:id,name',
-            'workingHours' // expects day_of_week, is_off, start_time, end_time
-        ]);
+public function show_employee(Business $business, Employee $employee)
+{
+    abort_if($employee->business_id !== $business->id, 404);
 
-        // group schedule by day
-        $schedule = $employee->workingHours
-            ->groupBy('day_of_week');
+    $employee->load([
+        'user',
+        'services:id,name',
+        'workingHours'
+    ]);
 
-        return view('business.admin.employee.show', compact('business', 'employee', 'schedule'));
-    }
+    $schedule = $employee->workingHours->groupBy('day_of_week');
+
+    $today   = Carbon::today()->toDateString();
+    $nowTime = Carbon::now()->format('H:i:s');
+
+    // Base query for this employee + business (only active statuses)
+    $base = AppointmentItem::query()
+        ->where('business_id', $business->id)
+        ->where('employee_id', $employee->id)
+        ->whereHas('appointment', function ($q) {
+            $q->whereIn('status', ['confirmed', 'pending', 'completed']);
+        });
+
+    // ✅ Completed count
+    $completedAppointments = (clone $base)
+        ->whereHas('appointment', fn ($q) => $q->where('status', 'completed'))
+        ->count();
+
+    // ✅ In Progress count (today and current time between start/end)
+    $inProgressAppointments = (clone $base)
+        ->whereHas('appointment', fn ($q) => $q->whereIn('status', ['confirmed', 'pending']))
+        ->whereDate('appointment_date', $today)
+        ->whereTime('start_time', '<=', $nowTime)
+        ->whereTime('end_time', '>=', $nowTime)
+        ->count();
+
+    // ✅ Upcoming base query (IMPORTANT: reuse same filter for count + list)
+    $upcomingBase = AppointmentItem::query()
+        ->where('business_id', $business->id)
+        ->where('employee_id', $employee->id)
+        ->whereHas('appointment', fn ($q) => $q->whereIn('status', ['confirmed', 'pending']))
+        ->where(function ($q) use ($today, $nowTime) {
+            $q->whereDate('appointment_date', '>', $today)
+              ->orWhere(function ($q2) use ($today, $nowTime) {
+                  $q2->whereDate('appointment_date', $today)
+                     ->whereTime('start_time', '>', $nowTime);
+              });
+        });
+
+    // ✅ Upcoming count (same logic)
+    $upcomingAppointments = (clone $upcomingBase)->count();
+
+    // ✅ Upcoming list (latest 4)
+    $upcomingItems = (clone $upcomingBase)
+        ->with([
+            'service:id,name',
+            'appointment:id,customer_id,status,notes',
+            'appointment.customer:id,user_id,customer_id',
+            'appointment.customer.user:id,name,email',
+        ])
+        ->orderBy('appointment_date')
+        ->orderBy('start_time')
+        ->limit(4)
+        ->get();
+
+    // ✅ total upcoming count to show in header (same as upcomingAppointments)
+    $upcomingCount = $upcomingAppointments;
+
+    return view('business.admin.employee.show', compact(
+        'business',
+        'employee',
+        'schedule',
+        'completedAppointments',
+        'inProgressAppointments',
+        'upcomingAppointments',
+        'upcomingCount',
+        'upcomingItems'     // ✅ MUST PASS THIS
+    ));
+}
     public function edit($businessSlug, $id, EmployeeService $employeeService)
     {
         $data = $employeeService->getEmployeeForEdit($businessSlug, $id);

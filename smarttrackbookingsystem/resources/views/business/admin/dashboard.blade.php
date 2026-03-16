@@ -4,7 +4,7 @@
 <div class="container-fluid">
 
 				<div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-					<h2 class="mb-3 me-auto">Welcome to {{ ucwords($business->name) }} dashboard</h2>
+					<h2 class="mb-3 me-auto">Welcome to {{ ucwords($business->name) }}</h2>
 					<div>
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
@@ -18,8 +18,8 @@
 						<div class="card">
 							<div class="card-body d-flex align-items-center justify-content-between">
 								<div class="card-data me-2">
-									<h5>Properties for Sale</h5>
-									<h2 class="fs-40 font-w600">684</h2>
+									<h5>Appointments</h5>
+									<h2 class="fs-40 font-w600">{{$totalAppointments}}</h2>
 								</div>
 								 <div><span class="donut1" data-peity='{ "fill": ["var(--primary)", "rgba(242, 246, 252)"]}'>5/6</span>
                                  </div>
@@ -30,8 +30,8 @@
 						<div class="card">
 							<div class="card-body d-flex align-items-center justify-content-between">
 								<div class="card-data me-2">
-									<h5>Properties for Rent</h5>
-									<h2 class="fs-40 font-w600">546</h2>
+									<h5>Pending Appointments</h5>
+									<h2 class="fs-40 font-w600">{{$pendingAppointments}}</h2>
 								</div>
 								 <div><span class="donut1" data-peity='{ "fill": ["rgb(56, 226, 93,1)", "rgba(242, 246, 252)"]}'>2/8</span>
                                  </div>
@@ -42,8 +42,8 @@
 						<div class="card">
 							<div class="card-body d-flex align-items-center justify-content-between">
 								<div class="card-data me-2">
-									<h5>Total Customer</h5>
-									<h2 class="fs-40 font-w600">3,672</h2>
+									<h5>Total Customers</h5>
+									<h2 class="fs-40 font-w600">{{ $totalCustomers }}</h2>
 								</div>
 								 <div><span class="donut1" data-peity='{ "fill": ["rgb(255, 135, 35,1)", "rgba(242, 246, 252)"]}'>5/8</span>
                                  </div>
@@ -54,8 +54,8 @@
 						<div class="card">
 							<div class="card-body d-flex align-items-center justify-content-between">
 								<div class="card-data me-2">
-									<h5>Total City</h5>
-									<h2 class="fs-40 font-w600">75</h2>
+									<h5>Total Employees</h5>
+									<h2 class="fs-40 font-w600">{{$totalEmployees}}</h2>
 								</div>
 								 <div><span class="donut1" data-peity='{ "fill": ["rgb(51, 62, 75,1)", "rgba(242, 246, 252)"]}'>3/8</span>
                                  </div>
@@ -414,45 +414,39 @@
 										</div>
 									</div>
 									<div class="card-body">
-										<div class="d-flex align-items-center mb-4">
-											<div class="recent-customer me-3">
-												<img src="images/contacts/pic-111.jpg" width="50" alt="">
-											</div>
-											<div>
-												<h5 class="mb-0">Benny Chagur</h5>
-												<p class="font-w600 mb-0 text-primary">MEMBER</p>
-											</div>
-										</div>	
-										<div class="d-flex align-items-center mb-4">
-											<div class="recent-customer me-3">
-												<img src="images/contacts/pic222.jpg" width="50" alt="">
-											</div>
-											<div>
-												<h5 class="mb-0">Chynita Bella</h5>
-												<p class="font-w600 mb-0 text-primary">MEMBER</p>
-											</div>
-										</div>	
-										<div class="d-flex align-items-center mb-4">
-											<div class="recent-customer me-3">
-												<img src="images/contacts/pic-333.jpg" width="50" alt="">
-											</div>
-											<div>
-												<h5 class="mb-0">David Heree</h5>
-												<p class="font-w600 mb-0">Regular Customer</p>
-											</div>
-										</div>	
-										<div class="d-flex align-items-center mb-0">
-											<div class="recent-customer me-3">
-												<img src="images/contacts/pic444.jpg" width="50" alt="">
-											</div>
-											<div>
-												<h5 class="mb-0">Evan D. Mas</h5>
-												<p class="font-w600 mb-0 text-primary">MEMBER</p>
-											</div>
-										</div>	
+											  @forelse($recentCustomers as $customer)
+
+												<div class="d-flex align-items-center mb-3">
+
+													<div class="me-3">
+														<img src="{{ asset('images/profile/profile.png') }}"
+															width="45"
+															class="rounded-circle">
+													</div>
+
+													<div>
+														<div class="fw-bold">
+															{{ $customer->user->name ?? '—' }}
+														</div>
+
+														<small class="text-muted">
+															{{ $customer->customer_id ?? 'Customer' }}
+														</small>
+													</div>
+
+												</div>
+
+											@empty
+
+												<p class="text-muted">No customers found</p>
+
+											@endforelse
 									</div>
 									<div class="card-footer border-0 pt-0">
-										<a href="javascript:void(0);" class="btn btn-primary btn-block">+ Add New Customer</a>
+										<a href="{{ route('business.customers.create', $business->slug) }}"
+										class="btn btn-primary w-100">
+											+ Add New Customer
+										</a>
 									</div>
 								</div>
 							</div>

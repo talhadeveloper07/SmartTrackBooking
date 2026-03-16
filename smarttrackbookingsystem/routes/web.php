@@ -17,7 +17,9 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('redirect.home');
 
-Route::get('/global-search', [SearchController::class, 'ajaxSearch'])->name('global.search.ajax');
+Route::get('/book-appointment', function () {
+    return view('frontend.form');
+});
 
 Route::middleware(['auth', 'usertype:org_admin'])
     ->prefix('org')        // adds /org before all URLs

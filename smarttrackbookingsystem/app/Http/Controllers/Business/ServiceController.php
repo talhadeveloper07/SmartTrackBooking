@@ -11,15 +11,15 @@ use App\Services\Business\Service\ServiceManagementService;
 
 class ServiceController extends Controller
 {
+     public function __construct(
+        protected ServiceManagementService $serviceManagementService
+    ) {}
+
     public function index(Business $business)
     {
-       $services = Service::with(['durations' => fn($q) => $q->orderBy('duration_minutes')])
-    ->withCount('employees')
-    ->where('business_id', $business->id)
-    ->latest()
-    ->get();
+        $services = $this->serviceManagementService->getBusinessServices($business);
 
-    return view('business.admin.services.index', compact('business', 'services'));
+        return view('business.admin.services.index', compact('business', 'services'));
     }
     public function add_service(Business $business)
     {
@@ -71,32 +71,33 @@ class ServiceController extends Controller
         return view('business.admin.services.edit', compact('business', 'service'));
     }
 
-    public function update(Request $request,Business $business,Service $service,ServiceManagementService $serviceManagementService) {
+    public function update(Request $request, Business $business, Service $service, ServiceManagementService $serviceManagementService)
+    {
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'status' => 'required|in:active,inactive',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
 
-        'durations' => 'required|array|min:1',
-        'durations.*.duration_minutes' => 'required|integer|min:1',
-        'durations.*.price' => 'required|numeric|min:0',
-        'durations.*.deposit' => 'nullable|numeric|min:0',
-        'durations.*.duration_name' => 'nullable|string|max:255',
-        'durations.*.status' => 'required|in:active,inactive',
-    ]);
+            'durations' => 'required|array|min:1',
+            'durations.*.duration_minutes' => 'required|integer|min:1',
+            'durations.*.price' => 'required|numeric|min:0',
+            'durations.*.deposit' => 'nullable|numeric|min:0',
+            'durations.*.duration_name' => 'nullable|string|max:255',
+            'durations.*.status' => 'required|in:active,inactive',
+        ]);
 
-    try {
+        try {
 
-        $serviceManagementService->update($business, $service, $validated);
+            $serviceManagementService->update($business, $service, $validated);
 
-        return redirect()
-            ->route('business.services', $business->slug)
-            ->with('success', 'Service updated successfully');
+            return redirect()
+                ->route('business.services', $business->slug)
+                ->with('success', 'Service updated successfully');
 
-    } catch (\Throwable $e) {
+        } catch (\Throwable $e) {
 
-        return back()->with('error', 'Something went wrong');
+            return back()->with('error', 'Something went wrong');
+        }
     }
-}
 }

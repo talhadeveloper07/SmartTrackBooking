@@ -5,6 +5,8 @@ namespace App\Services\Business\Service;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Business;
+use Illuminate\Database\Eloquent\Collection;
 
 class ServiceManagementService
 {
@@ -137,6 +139,61 @@ class ServiceManagementService
         if ($duplicates->isNotEmpty()) {
             throw new \Exception('Duplicate duration minutes are not allowed.');
         }
+    }
+
+     public function getBusinessServices(Business $business): Collection
+    {
+        return Service::query()
+            ->with([
+                'durations' => fn ($q) => $q->orderBy('duration_minutes')
+            ])
+            ->withCount('employees')
+            ->where('business_id', $business->id)
+            ->latest()
+            ->get();
+    }
+
+public function getBusinessServicesForApi(Business $business): Collection
+{
+    return Service::query()
+        ->with([
+            'durations' => fn ($q) => $q->orderBy('duration_minutes')
+        ])
+        ->withCount('employees')
+        ->where('business_id', $business->id)
+        ->latest()
+        ->get([
+            'id',
+            'name',
+            'slug',
+            'description',
+            'business_id'
+        ]);
+}
+ public function getServiceDetails(Business $business, Service $service): array
+    {
+        abort_if($service->business_id !== $business->id, 404);
+
+        $service->load([
+            'durations' => fn ($q) => $q->orderBy('duration_minutes'),
+            'employees' => fn ($q) => $q->orderBy('name'),
+        ]);
+
+        return [
+            'service' => [
+                'id' => $service->id,
+                'name' => $service->name,
+            ],
+            'durations' => $service->durations->map(fn ($d) => [
+                'id' => $d->id,
+                'duration_minutes' => (int) $d->duration_minutes,
+                'price' => $d->price !== null ? (float) $d->price : null,
+            ])->values(),
+            'employees' => $service->employees->map(fn ($e) => [
+                'id' => $e->id,
+                'name' => $e->name,
+            ])->values(),
+        ];
     }
 
 }

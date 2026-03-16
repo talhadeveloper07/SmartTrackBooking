@@ -114,81 +114,71 @@
 		<script>
 let debounceTimer;
 
-$('#global-search').on('keyup', function() {
-
-    let query = $(this).val();
+$('#global-search').on('keyup', function () {
+    let query = $(this).val().trim();
+    const SEARCH_URL = @json(route('business.global.search.ajax', $business->slug));
 
     clearTimeout(debounceTimer);
 
-    debounceTimer = setTimeout(function() {
+    debounceTimer = setTimeout(function () {
 
         if (query.length < 1) {
-           $('#search-dropdown').html(html).removeClass('d-none').css('display', 'block');
+            $('#search-dropdown').addClass('d-none').html('');
             return;
         }
 
         $.ajax({
-            url: "{{ route('global.search.ajax') }}",
+            url: SEARCH_URL,
             type: "GET",
             data: { q: query },
-            success: function(response) {
-
+            success: function (response) {
                 let html = '';
 
-                // Appointments
-                if (response.appointments.length) {
-                    html += '<div class="search-section"><strong>Appointments</strong>';
-                  response.appointments.forEach(item => {
-    html += `<div class="search-item">
-                Appointment #${item.id} - ${item.appointment_date}
-            </div>`;
-});
+                if (response.appointments?.length) {
+                    html += '<div class="search-section"><strong class="text-primary">Appointments</strong>';
+                    response.appointments.forEach(item => {
+                        html += `<a href="${item.url}" class="d-block search-item">Appointment #${item.id} - ${item.appointment_date}</a>`;
+                    });
                     html += '</div>';
                 }
 
-                // Customers
-                if (response.customer.length) {
-                    html += '<div class="search-section"><strong>Customers</strong>';
+                if (response.customer?.length) {
+                    html += '<div class="search-section"><strong class="text-primary">Customers</strong>';
+
                     response.customer.forEach(item => {
-                        html += `<div class="search-item">
-                                    ${item.user.name} <!-- assuming your API returns 'user' relation -->
-                                </div>`;
+                        const label = item.name || item.customer_id || 'Customer';
+                        html += `<a class="search-item d-block" href="${item.url}">${label}</a>`;
                     });
-                    html += '</div>';
-                }
 
-                // Agents
-                if (response.employee.length) {
-                    html += '<div class="search-section"><strong>Agents</strong>';
+                    html += '</div>';
+                    }
+
+                if (response.employee?.length) {
+                    html += '<div class="search-section"><strong class="text-primary">Employees</strong>';
                     response.employee.forEach(item => {
-                        html += `<div class="search-item">
-                                    ${item.name}
-                                </div>`;
+                        html += `<a href="${item.url}" class="d-block search-item">${item.name}</a>`;
                     });
                     html += '</div>';
                 }
 
-                // Services
-                if (response.service.length) {
-                    html += '<div class="search-section"><strong>Services</strong>';
+                if (response.service?.length) {
+                    html += '<div class="search-section"><strong class="text-primary">Services</strong>';
                     response.service.forEach(item => {
-                        html += `<div class="search-item">
-                                    ${item.name}
-                                </div>`;
+                        html += `<div class="search-item">${item.name}</div>`;
                     });
                     html += '</div>';
                 }
 
-                if (html === '') {
-                    html = '<div class="search-item text-muted">No results found</div>';
-                }
+                if (!html) html = '<div class="search-item text-muted">No results found</div>';
 
                 $('#search-dropdown').html(html).removeClass('d-none');
+            },
+            error: function () {
+                $('#search-dropdown').html('<div class="search-item text-danger">Error fetching results</div>').removeClass('d-none');
             }
         });
 
-    }, 300); // debounce 300ms
-
+    }, 300);
 });
 </script>
 </html>

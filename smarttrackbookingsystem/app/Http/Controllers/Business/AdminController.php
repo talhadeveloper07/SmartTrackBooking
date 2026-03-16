@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Business;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Business;
+use App\Models\Appointment;
+use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\BusinessAdmin;
 use App\Services\Dashboard\DashboardSettingService;
 use App\Services\Business\Profile\ProfileService;
@@ -12,7 +15,30 @@ class AdminController extends Controller
 {
     public function index(Business $business)
     {
-         return view('business.admin.dashboard', compact('business'));
+    $totalAppointments = Appointment::where('business_id', $business->id)->count();
+
+    $pendingAppointments = Appointment::where('business_id', $business->id)
+        ->whereIn('status', ['pending']) // add 'confirmed' if you want as pending-like
+        ->count();
+
+    $totalCustomers = Customer::where('business_id', $business->id)->count();
+
+    $totalEmployees = Employee::where('business_id', $business->id)->count();
+    
+    $recentCustomers = Customer::where('business_id', $business->id)
+        ->with('user:id,name,email')
+        ->latest()
+        ->limit(4)
+        ->get();
+
+    return view('business.admin.dashboard', compact(
+        'business',
+        'totalAppointments',
+        'pendingAppointments',
+        'totalCustomers',
+        'totalEmployees',
+        'recentCustomers'
+    ));
     }
     public function edit(Business $business)
     {

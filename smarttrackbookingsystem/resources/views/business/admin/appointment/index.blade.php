@@ -6,9 +6,14 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Appointments</h3>
 
-        <a href="{{ route('business.appointments.create', $business->slug) }}" class="btn btn-primary">
+       <div class="d-flex gap-2">
+         <a href="{{ route('business.appointments.calendar', $business->slug) }}" class="btn py-2 px-3 btn-outline-primary">
+            <i class="fa fa-calendar me-2"></i> Calendar View
+        </a>
+         <a href="{{ route('business.appointments.create', $business->slug) }}" class="btn py-2 px-3 btn-primary">
             <i class="fa fa-plus me-2"></i> New Appointment
         </a>
+       </div>
     </div>
 
     {{-- Filters --}}
@@ -70,8 +75,8 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="appointmentsTable" class="table align-middle">
-                    <thead class="table-light">
+                <table id="appointmentsTable" class="table align-middle w-100">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>Date</th>

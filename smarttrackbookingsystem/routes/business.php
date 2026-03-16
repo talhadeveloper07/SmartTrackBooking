@@ -6,6 +6,7 @@ use App\Http\Controllers\Business\ServiceController;
 use App\Http\Controllers\Business\EmployeeController;
 use App\Http\Controllers\Business\CustomerController;
 use App\Http\Controllers\Business\AppointmentController;
+use App\Http\Controllers\SearchController;
 
 Route::prefix('{business:slug}/admin')
     ->name('business.')
@@ -62,9 +63,7 @@ Route::prefix('{business:slug}/admin')
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
         Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
         Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-       Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])
-            ->whereNumber('appointment')
-            ->name('appointments.show');
+       Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])->whereNumber('appointment')->name('appointments.show');
 
         Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
             ->whereNumber('appointment')
@@ -77,6 +76,31 @@ Route::prefix('{business:slug}/admin')
         Route::get('/appointments/available-slots', [AppointmentController::class, 'availableSlots'])
             ->name('appointments.available.slots');
         Route::get('/appointments/data', [AppointmentController::class, 'data'])->name('appointments.data');
+
+        Route::get('/global-search', [SearchController::class, 'ajaxSearch'])
+            ->name('global.search.ajax');
+
+          Route::get('/appointments/calendar', [AppointmentController::class, 'calendar'])
+            ->name('appointments.calendar');
+
+
+        Route::get('/appointments/calendar', [AppointmentController::class, 'calendar'])
+            ->name('appointments.calendar');
+
+        // Calendar events JSON (for FullCalendar)
+        Route::get('/appointments/calendar-events', [AppointmentController::class, 'calendarEvents'])
+            ->name('appointments.calendar.events');
+
+            Route::post(
+        'appointments/{appointment}/items/{item}/complete',
+        [AppointmentController::class, 'completeItem']
+    )->name('appointment-items.complete');
+
+    // cancel single appointment item
+    Route::post(
+        'appointments/{appointment}/items/{item}/cancel',
+        [AppointmentController::class, 'cancelItem']
+    )->name('appointment-items.cancel');
 
 
 });
