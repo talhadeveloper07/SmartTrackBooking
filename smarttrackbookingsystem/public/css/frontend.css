@@ -1,0 +1,101 @@
+.booking-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5f7fb;
+}
+
+.booking-card {
+    width: 500px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* STEP PROGRESS */
+.steps-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.step-item {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-item span {
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #555;
+    font-weight: bold;
+}
+
+.step-item.active span {
+    background: #2563eb;
+    color: #fff;
+}
+
+.step-item p {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* PLAN BOX */
+.plan-box {
+    background: #eef2ff;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+input:focus, textarea:focus {
+    border-color: #2563eb;
+}
+
+/* BUTTONS */
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.next-btn, #submitBtn {
+    background: #2563eb;
+    color: #fff;
+    width: 100%;
+}
+
+.back-btn {
+    background: #f3f4f6;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-group button {
+    flex: 1;
+}

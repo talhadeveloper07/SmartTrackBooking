@@ -108,6 +108,6 @@ Route::prefix('{business:slug}/admin')
     ->middleware(['auth']);
 
     Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription.index');
-
+    Route::get('/billing-portal', [SubscriptionController::class, 'billingPortal'])->name('billing.portal');
 
 });

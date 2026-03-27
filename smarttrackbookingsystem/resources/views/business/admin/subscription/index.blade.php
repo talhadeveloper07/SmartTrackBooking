@@ -29,6 +29,10 @@
                     <p>No active subscription</p>
                 @endif
 
+                <a href="{{ route('business.billing.portal', $business->slug) }}" class="btn btn-primary">
+    Manage Billing
+</a>
+
             </div>
         </div>
 

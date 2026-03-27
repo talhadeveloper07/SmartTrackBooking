@@ -97,4 +97,28 @@ public function upgradePlan(Request $request, $businessSlug)
         return back()->with('error', $e->getMessage());
     }
 }
+public function billingPortal($businessSlug)
+{
+    $user = auth()->user();
+    $business = $user->businessAdmin->business;
+
+    if (!$business || $business->slug !== $businessSlug) {
+        return back()->with('error', 'Invalid business.');
+    }
+
+    $subscription = $business->subscription;
+
+    if (!$subscription || !$subscription->stripe_customer_id) {
+        return back()->with('error', 'No billing account found.');
+    }
+
+    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+    $session = \Stripe\BillingPortal\Session::create([
+        'customer' => $subscription->stripe_customer_id,
+        'return_url' => route('business.subscription.index', $business->slug),
+    ]);
+
+    return redirect($session->url);
+}
 }
