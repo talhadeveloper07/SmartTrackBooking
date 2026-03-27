@@ -49,6 +49,7 @@
                 <ul aria-expanded="false">
                     <li><a href="{{ route('business.settings.edit', $business->slug) }}">Dashboard Settings</a></li>
                     <li><a href="{{ route('business.profile.edit', $business->slug) }}">Profile Settings</a></li>
+                    <li><a href="{{ route('business.subscription.index', $business->slug) }}"><i class="icon-credit-card"></i>Subscription</a></li>
                 </ul>
             </li>
         </ul>

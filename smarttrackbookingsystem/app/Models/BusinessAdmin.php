@@ -13,7 +13,6 @@ class BusinessAdmin extends Model
     protected $casts = [
         'permissions' => 'array', // IMPORTANT: permissions stored as JSON
     ];
-
     public function business()
     {
         return $this->belongsTo(Business::class);
@@ -23,4 +22,14 @@ class BusinessAdmin extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function admins()
+{
+    return $this->hasMany(BusinessAdmin::class);
+}
+
+public function owner()
+{
+    return $this->belongsTo(User::class, 'owner_id');
+}
 }

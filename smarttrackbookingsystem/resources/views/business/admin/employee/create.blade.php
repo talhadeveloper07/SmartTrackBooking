@@ -23,6 +23,19 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    @if(session('plan_error'))
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-arrow-up-right-from-square me-3"></i>
+                <div>
+                    <strong>Limit Reached!</strong> {{ session('plan_error') }}
+                    <a href="{{ route('org.plans.index') }}" class="btn btn-sm btn-outline-danger ms-3">View Upgrade Options</a>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <form action="{{ route('business.employees.store', $business->slug) }}" method="POST">
         @csrf
 

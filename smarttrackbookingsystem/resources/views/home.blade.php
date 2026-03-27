@@ -1,21 +1,6 @@
 @extends('layouts.app')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
-
-
 @section('content')
-<div class="main-menu-w">
-        <div class="container">
-            <div class="main-menu">
-                <div class="main-menu-logo">
-                    <a href="https://latepoint.com" class="logo-link">
-                        <img width="30" src="https://latepoint.com/wp-content/themes/latepoint-wp-landing8/assets/images/logo.svg" alt="LatePoint Logo">
-                    </a>
-                </div>
-                 <a href="{{route('login')}}" class="btn btn-primary">Sign In<i class="fas fa-arrow"></i></a>
-  </div>
-        </div>
-    </div>
+
 <div class="container wide">
       
             <div class="ph-intro">

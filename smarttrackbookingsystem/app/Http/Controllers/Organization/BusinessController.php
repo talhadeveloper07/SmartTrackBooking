@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Organization;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Business;
+use App\Models\BusinessSubscription;
+use App\Models\Plan;
 use DataTables;
 use Illuminate\Support\Str;
 
@@ -52,33 +55,55 @@ class BusinessController extends Controller
 
     public function add_new_business()
     {
-        return view('organization.business.add');
+        $plans = Plan::where('active', true)->get();
+        return view('organization.business.add', compact('plans'));
     }
 
     public function store_business(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required',
-            'email' => 'nullable|email',
-            'logo' => 'nullable|image',
-            'cover_image' => 'nullable|image',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|unique:businesses,name',
+        'email' => 'nullable|email',
+        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'plan_id' => 'required|exists:plans,id',
+    ]);
 
-        // generate slug automatically
-        $data['slug'] = Str::slug($request->name);
+    // Use a transaction to ensure both records are created together
+    DB::transaction(function () use ($request) {
+        
+        // 1. Prepare Business Data
+        $businessData = $request->except(['logo', 'cover_image', 'plan_id']);
+        $businessData['slug'] = Str::slug($request->name) . '-' . rand(100, 999); // Added rand to avoid slug collisions
 
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('business', 'public');
+            $businessData['logo'] = $request->file('logo')->store('business', 'public');
         }
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('business', 'public');
+            $businessData['cover_image'] = $request->file('cover_image')->store('business', 'public');
         }
 
-        Business::create($request->except(['logo', 'cover_image']) + $data);
+        // 2. Create Business
+        $business = Business::create($businessData);
 
-        return redirect()->route('org.business-accounts')->with('success', 'Business Created');
-    }
+        // 3. Create Subscription Record
+        // We fetch the plan to see if we need to calculate dates or prices
+        $plan = Plan::find($request->plan_id);
+
+        BusinessSubscription::create([
+            'business_id'            => $business->id,
+            'plan_id'                => $plan->id,
+            'status'                 => 'active',
+            'starts_at'              => now(),
+            'ends_at'                => now()->addMonth(), // Defaulting to 1 month; adjust as needed
+            'stripe_customer_id'     => null, // Admin created, so likely no Stripe ID yet
+            'stripe_subscription_id' => null,
+        ]);
+    });
+
+    return redirect()->route('org.business-accounts')->with('success', 'Business and Subscription Plan created successfully');
+}
 
     public function edit(Business $business)
     {

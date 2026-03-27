@@ -8,6 +8,9 @@ use App\Http\Controllers\Organization\BusinessAdminController;
 use App\Http\Controllers\Business\AdminController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Str;
+use App\Http\Controllers\Organization\PlanController;
+use App\Http\Controllers\Business\Frontend\PriceController;
+use App\Http\Controllers\Organization\Frontend\BusinessAuthController;
 
 Route::get('/', function () {
     return view('home');
@@ -16,10 +19,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('redirect.home');
-
-Route::get('/book-appointment', function () {
-    return view('frontend.form');
-});
 
 Route::middleware(['auth', 'usertype:org_admin'])
     ->prefix('org')        // adds /org before all URLs
@@ -43,12 +42,9 @@ Route::middleware(['auth', 'usertype:org_admin'])
         Route::post('/businesses/{business:slug}/admins', [BusinessAdminController::class,'store'])->name('business.admins.store');
         
         // SETTINGS
-        Route::get('/settings', [OrganizationController::class, 'edit'])
-            ->name('settings.edit');
-
-        Route::put('/settings', [OrganizationController::class, 'update'])
-            ->name('settings.update');
-
+        Route::get('/settings', [OrganizationController::class, 'edit'])->name('settings.edit');
+        Route::put('/settings', [OrganizationController::class, 'update'])->name('settings.update');
+        Route::resource('plans', PlanController::class);
 
 });
 
@@ -61,5 +57,18 @@ Route::middleware(['auth', 'usertype:customer'])
     ->get('/customer/dashboard', fn () => view('business.customer.dashboard'))
     ->name('customer.dashboard');
 
+// Frontend Form Route for businesses
+Route::get('/book-appointment', function () {
+    return view('frontend.form');
+});
+
+Route::get('/pricing', [PriceController::class, 'index'])->name('pricing');
+Route::get('/register/business/{plan}', [BusinessAuthController::class, 'showRegister'])->name('register.business');
+Route::post('/register/business', [BusinessAuthController::class, 'register'])->name('register.business.submit');
+Route::get('/stripe/success', [BusinessAuthController::class, 'success'])->name('stripe.success');
+
+Route::get('/stripe/cancel', [BusinessAuthController::class, 'cancel'])->name('stripe.cancel');
+
 require __DIR__.'/business.php';
 require __DIR__.'/employee.php';
+

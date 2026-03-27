@@ -31,13 +31,21 @@ class AdminController extends Controller
         ->limit(4)
         ->get();
 
+  
+    $user = auth()->user();
+
+    $business = $user->businessAdmin->business ?? null;
+
+    $subscription = $business ? $business->subscription : null;
+
     return view('business.admin.dashboard', compact(
         'business',
         'totalAppointments',
         'pendingAppointments',
         'totalCustomers',
         'totalEmployees',
-        'recentCustomers'
+        'recentCustomers',
+        'subscription'
     ));
     }
     public function edit(Business $business)

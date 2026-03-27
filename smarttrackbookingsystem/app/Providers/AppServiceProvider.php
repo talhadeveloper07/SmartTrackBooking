@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +19,20 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
-    }
+   public function boot()
+{
+     View::composer('*', function ($view) {
+        if (auth()->check()) {
+
+            $user = auth()->user();
+
+            $business = $user->businessAdmin->business ?? null;
+            $subscription = $business ? $business->subscription : null;
+
+            // ✅ pass BOTH
+            $view->with('subscription', $subscription);
+            $view->with('business', $business);
+        }
+    });
+}
 }

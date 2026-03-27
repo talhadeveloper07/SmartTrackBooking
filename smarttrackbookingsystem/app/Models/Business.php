@@ -12,9 +12,22 @@ class Business extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'slug', 'business_type', 'email', 'phone',
-        'address', 'city', 'state', 'country', 'postal_code', 'logo',
-        'cover_image', 'description', 'business_hours', 'settings', 'status'
+        'name',
+        'slug',
+        'business_type',
+        'email',
+        'phone',
+        'address',
+        'city',
+        'state',
+        'country',
+        'postal_code',
+        'logo',
+        'cover_image',
+        'description',
+        'business_hours',
+        'settings',
+        'status'
     ];
 
     protected $casts = [
@@ -25,12 +38,12 @@ class Business extends Model
     /**
      * Get the admins for this business.
      */
-   public function admins()
-{
-    return $this->belongsToMany(User::class, 'business_admins')
-        ->withPivot('permissions', 'status', 'position') // add position
-        ->withTimestamps();
-}
+    public function admins()
+    {
+        return $this->belongsToMany(User::class, 'business_admins')
+            ->withPivot('permissions', 'status', 'position') // add position
+            ->withTimestamps();
+    }
 
     /**
      * Get the employees for this business.
@@ -65,4 +78,27 @@ class Business extends Model
     {
         return $this->morphOne(DashboardSetting::class, 'owner');
     }
+
+
+    public function subscriptions()
+    {
+        return $this->hasMany(BusinessSubscription::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(BusinessSubscription::class)->latestOfMany();
+    }
+
+   public function plan()
+{
+    return $this->hasOneThrough(
+        \App\Models\Plan::class,
+        \App\Models\BusinessSubscription::class,
+        'business_id', // Foreign key on subscriptions table
+        'id',          // Foreign key on plans table
+        'id',          // Local key on business table
+        'plan_id'      // Local key on subscriptions table
+    )->where('business_subscriptions.status', 'active');
+}
 }

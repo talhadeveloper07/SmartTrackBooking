@@ -1,5 +1,5 @@
-@extends('organization.layouts.app')
-@section('organization_content')
+@extends('business.customer.layouts.app')
+@section('customer_content')
 
 <div class="container-fluid">
 				<div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">

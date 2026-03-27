@@ -110,6 +110,18 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label">Subscription Plan <span class="text-danger">*</span></label>
+                                    <select name="plan_id" class="default-select form-control wide" required>
+                                        <option value="">Select a Plan</option>
+                                        @foreach($plans as $plan)
+                                            <option value="{{ $plan->id }}">
+                                                {{ $plan->name }} - (${{ $plan->price }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label">Business Hours (JSON or text)</label>
                                     <textarea name="business_hours" rows="3" class="form-control"
                                         placeholder='Mon-Fri 9AM-6PM'></textarea>

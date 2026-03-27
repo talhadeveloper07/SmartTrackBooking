@@ -6,11 +6,13 @@ use App\Http\Controllers\Business\ServiceController;
 use App\Http\Controllers\Business\EmployeeController;
 use App\Http\Controllers\Business\CustomerController;
 use App\Http\Controllers\Business\AppointmentController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\Organization\Frontend\BusinessAuthController;
 use App\Http\Controllers\SearchController;
 
 Route::prefix('{business:slug}/admin')
     ->name('business.')
-    ->middleware(['auth','usertype:business_admin','inject.business'])
+    ->middleware(['auth','usertype:business_admin','inject.business','active.subscription'])
     ->group(function () {
 
         // Business Service Routes
@@ -53,7 +55,6 @@ Route::prefix('{business:slug}/admin')
             ->name('settings.update');
 
         // Profile Settings
-
         Route::get('/profile', [AdminController::class, 'edit_profile'])->name('profile.edit');
         Route::put('/profile', [AdminController::class, 'update_profile'])->name('profile.update');
         Route::post('/profile/password/email', [AdminController::class, 'sendPasswordResetLink'])
@@ -101,6 +102,12 @@ Route::prefix('{business:slug}/admin')
         'appointments/{appointment}/items/{item}/cancel',
         [AppointmentController::class, 'cancelItem']
     )->name('appointment-items.cancel');
+
+    Route::post('/upgrade-plan', [SubscriptionController::class, 'upgradePlan'])
+    ->name('upgrade.plan')
+    ->middleware(['auth']);
+
+    Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription.index');
 
 
 });

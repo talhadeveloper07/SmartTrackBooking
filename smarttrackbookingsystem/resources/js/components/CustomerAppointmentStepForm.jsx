@@ -4,6 +4,8 @@ import StepSelectDuration from './booking/StepSelectDuration';
 import StepSelectEmployee from './booking/StepSelectEmployee';
 import StepSelectDateTime from './booking/StepSelectDateTime';
 import AuthStep from './booking/AuthStep';
+import CheckoutStep from './booking/CheckoutStep';
+import BookingSuccessStep from './booking/BookingSuccessStep';
 
 const emptyServiceItem = (id) => ({
     localId: id,
@@ -36,16 +38,20 @@ export default function CustomerAppointmentStepForm({ businessSlug }) {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [loadingDates, setLoadingDates] = useState(false);
     const [loadingSlots, setLoadingSlots] = useState(false);
-    const [availabilityError, setAvailabilityError] = useState('');
+    const [availabilityError, setAvailabilityError] = useState(''); 
 
     const [authMode, setAuthMode] = useState('login');
-    const [authData, setAuthData] = useState({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        password: '',
-    });
+const [authData, setAuthData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    password: '',
+});
+const [authLoading, setAuthLoading] = useState(false);
+const [authError, setAuthError] = useState('');
+const [authenticatedUser, setAuthenticatedUser] = useState(null);
+const [bookingResponse, setBookingResponse] = useState(null);
 
     const [currentItem, setCurrentItem] = useState(emptyServiceItem(Date.now()));
 
@@ -341,6 +347,66 @@ export default function CustomerAppointmentStepForm({ businessSlug }) {
         setStep(1);
     };
 
+   const handleAuthContinue = async () => {
+    try {
+        setAuthLoading(true);
+        setAuthError('');
+
+        const url =
+            authMode === 'login'
+                ? `http://127.0.0.1:8000/api/business/${businessSlug}/auth/login`
+                : `http://127.0.0.1:8000/api/business/${businessSlug}/auth/register`;
+
+        const payload =
+            authMode === 'login'
+                ? {
+                      email: authData.email,
+                      password: authData.password,
+                  }
+                : {
+                      first_name: authData.first_name,
+                      last_name: authData.last_name,
+                      email: authData.email,
+                      phone: authData.phone,
+                      password: authData.password,
+                  };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Authentication failed.');
+        }
+
+        if (result?.data?.token) {
+            localStorage.setItem('booking_token', result.data.token);
+        }
+
+        if (result?.data?.user) {
+            localStorage.setItem('booking_user', JSON.stringify(result.data.user));
+            setAuthenticatedUser({
+                ...result.data.user,
+                customer_id: result?.data?.customer?.id || null,
+            });
+        }
+
+        setStep(6);
+    } catch (error) {
+        console.error(error);
+        setAuthError(error.message || 'Something went wrong.');
+    } finally {
+        setAuthLoading(false);
+    }
+};
+
     if (loadingServices) {
         return (
             <div className="container py-5">
@@ -485,18 +551,50 @@ export default function CustomerAppointmentStepForm({ businessSlug }) {
             )}
 
             {step === 5 && (
-                <AuthStep
-                    savedItems={savedItems}
-                    authMode={authMode}
-                    setAuthMode={setAuthMode}
-                    authData={authData}
-                    setAuthData={setAuthData}
-                    onBack={handleBackToLastService}
-                    onAddMoreService={handleAddMoreService}
-                    onContinue={() => alert('Next step: checkout')}
-                    onRemoveItem={handleRemoveItem}
-                />
-            )}
+    <AuthStep
+        savedItems={savedItems}
+        authMode={authMode}
+        setAuthMode={setAuthMode}
+        authData={authData}
+        setAuthData={setAuthData}
+        onBack={handleBackToLastService}
+        onAddMoreService={handleAddMoreService}
+        onContinue={handleAuthContinue}
+        onRemoveItem={handleRemoveItem}
+        loading={authLoading}
+        error={authError}
+    />
+)}
+{step === 6 && (
+    <CheckoutStep
+        businessSlug={businessSlug}
+        savedItems={savedItems}
+        authData={authData}
+        authenticatedUser={authenticatedUser}
+        onBack={() => setStep(5)}
+        onRemoveItem={handleRemoveItem}
+        onBookingSuccess={(result) => {
+            setBookingResponse(result);
+            setStep(7);
+        }}
+    />
+)}
+{step === 7 && (
+    <BookingSuccessStep
+        bookingResponse={bookingResponse}
+        onBookAnother={() => {
+            setSavedItems([]);
+            setCurrentItem(emptyServiceItem(Date.now()));
+            setSelectedServiceDetails(null);
+            setAvailableDates([]);
+            setAvailableSlots([]);
+            setAvailabilityError('');
+            setAuthError('');
+            setBookingResponse(null);
+            setStep(1);
+        }}
+    />
+)}
         </>
     );
 }

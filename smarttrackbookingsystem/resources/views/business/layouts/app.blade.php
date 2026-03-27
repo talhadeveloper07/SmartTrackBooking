@@ -57,9 +57,6 @@
 </style>
     </head>
     <body>
-
-    
-
     <div id="preloader">
 		<div class="lds-ripple">
 			<div></div>
@@ -71,6 +68,40 @@
         @include('business.layouts.header');
         @include('business.layouts.sidebar');
          <div class="content-body">
+            @php
+    $user = auth()->user();
+    // Use the relationship we just defined
+    $business = $user ? $user->business : null;
+    $showUpgradeAlert = false;
+
+    if ($business) {
+        // Get the active plan through the business
+        $plan = $business->plan; 
+        
+        if ($plan) {
+            $currentCount = $business->employees()->count();
+            $limit = $plan->max_employees;
+
+            if ($currentCount >= $limit) {
+                $showUpgradeAlert = true;
+            }
+        }
+    }
+@endphp
+
+@if($showUpgradeAlert)
+    <div class="alert alert-warning border-0 shadow-sm mx-4 mt-3 alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+            <div>
+                <strong>Limit Reached:</strong> 
+                You are using <b>{{ $currentCount }}</b> out of <b>{{ $limit }}</b> allowed employees.
+            </div>
+            <a href="{{ route('pricing') }}" class="btn btn-sm btn-dark ms-auto mx-3">Upgrade Plan</a>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
                 @yield('business_content')
          </div>
        

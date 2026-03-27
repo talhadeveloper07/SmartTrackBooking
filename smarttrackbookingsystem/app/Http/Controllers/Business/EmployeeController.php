@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\AppointmentItem;
 use Carbon\Carbon;
 use App\Models\Service;
+use App\Models\BusinessSubscription;
 use DataTables;
 use App\Services\Business\Employee\EmployeeService;
 
@@ -54,11 +55,26 @@ class EmployeeController extends Controller
                 ->make(true);
         }
     }
+   
     public function create(Business $business)
-    {
-        $services = Service::where('business_id', $business->id)->orderBy('name')->get();
-        return view('business.admin.employee.create', compact('business', 'services'));
+{
+    $plan = $business->plan; 
+
+    // Case 1: No Plan Assigned
+    if (!$plan) {
+        return redirect()->back()->with('plan_error', 'No active subscription found. Please assign a plan to this business.');
     }
+
+    // Case 2: Limit Reached
+    $currentEmployeeCount = $business->employees()->count();
+    if ($currentEmployeeCount >= $plan->max_employees) {
+        return redirect()->back()->with('plan_error', "Limit Reached: Your '{$plan->name}' plan allows max {$plan->max_employees} employees. Please upgrade.");
+    }
+
+    // Case 3: Success - Show Form
+    $services = Service::where('business_id', $business->id)->orderBy('name')->get();
+    return view('business.admin.employee.create', compact('business', 'services'));
+}
 
     public function store(Request $request, Business $business, EmployeeService $employeeService)
     {
