@@ -10,6 +10,9 @@ use App\Models\Business;
 use App\Models\BusinessAdmin;
 use App\Models\BusinessSubscription;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BusinessRegisteredMail;
+use App\Mail\InvoiceMail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -67,7 +70,7 @@ class BusinessAuthController extends Controller
     /**
      * STEP 2: Handle Success & Create Account
      */
-   public function success(Request $request)
+public function success(Request $request)
 {
     if (!$request->has('session_id')) {
         return redirect()->route('login')->with('error', 'Invalid session.');
@@ -81,14 +84,14 @@ class BusinessAuthController extends Controller
         return redirect()->route('login')->with('error', 'Invalid Stripe session.');
     }
 
-    // ❌ If payment not completed
+    // ❌ Payment not completed
     if ($session->payment_status !== 'paid') {
         return redirect()->route('login')->with('error', 'Payment not completed.');
     }
 
     $data = $session->metadata;
 
-    // ✅ Prevent duplicate account (VERY IMPORTANT)
+    // ✅ Prevent duplicate account
     if (User::where('email', $data->email)->exists()) {
         return redirect()->route('login')->with('success', 'Account already created. Please login.');
     }
@@ -96,6 +99,9 @@ class BusinessAuthController extends Controller
     DB::beginTransaction();
 
     try {
+
+        // ✅ Get plan
+        $plan = Plan::findOrFail($data->plan_id);
 
         // ✅ Create user
         $user = User::create([
@@ -110,17 +116,17 @@ class BusinessAuthController extends Controller
             'name' => $data->business_name,
             'slug' => $this->generateUniqueSlug($data->business_name),
             'email' => $data->email,
-            'phone' => $data->phone,
-            'address' => $data->address,
-            'city' => $data->city,
-            'state' => $data->state,
-            'country' => $data->country,
-            'postal_code' => $data->postal_code,
-            'business_type' => $data->business_type,
-            'description' => $data->description,
+            'phone' => $data->phone ?? null,
+            'address' => $data->address ?? null,
+            'city' => $data->city ?? null,
+            'state' => $data->state ?? null,
+            'country' => $data->country ?? null,
+            'postal_code' => $data->postal_code ?? null,
+            'business_type' => $data->business_type ?? null,
+            'description' => $data->description ?? null,
         ]);
 
-        // ✅ Business Admin
+        // ✅ Attach admin
         BusinessAdmin::create([
             'business_id' => $business->id,
             'user_id' => $user->id,
@@ -129,33 +135,31 @@ class BusinessAuthController extends Controller
             'status' => 'active',
         ]);
 
-        $session = \Stripe\Checkout\Session::retrieve($request->session_id);
-
-        $data = $session->metadata;
-
-        // Stripe data
+        // ✅ Stripe data
         $customerId = $session->customer;
         $subscriptionId = $session->subscription;
 
-        // Get subscription details
-        $subscription = \Stripe\Subscription::retrieve($subscriptionId);
+        // ✅ Get subscription
+        $stripeSubscription = \Stripe\Subscription::retrieve($subscriptionId);
 
-        if (!empty($subscription->current_period_start)) {
-            $start = \Carbon\Carbon::createFromTimestamp($subscription->current_period_start);
-            $end   = \Carbon\Carbon::createFromTimestamp($subscription->current_period_end);
-        } else {
-            // fallback if Stripe hasn't returned data yet
-            $start = now();
-            $end = now()->addMonth();
-        }
-            BusinessSubscription::create([
+        // ✅ Safe timestamp handling
+        $start = !empty($stripeSubscription->current_period_start)
+            ? \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_start)
+            : now();
+
+        $end = !empty($stripeSubscription->current_period_end)
+            ? \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end)
+            : now()->addMonth();
+
+        // ✅ Save subscription
+        BusinessSubscription::create([
             'business_id' => $business->id,
-            'plan_id' => $data->plan_id,
+            'plan_id' => $plan->id,
             'stripe_customer_id' => $customerId,
             'stripe_subscription_id' => $subscriptionId,
-            'stripe_price_id' => $subscription->items->data[0]->price->id,
+            'stripe_price_id' => $stripeSubscription->items->data[0]->price->id,
             'trial_ends_at' => now()->addDays(7),
-            'status' => $subscription->status,
+            'status' => $stripeSubscription->status,
             'starts_at' => $start,
             'ends_at' => $end,
         ]);
@@ -165,9 +169,39 @@ class BusinessAuthController extends Controller
             'email' => $user->email
         ]);
 
+        // =========================
+        // 🔥 EMAILS SECTION
+        // =========================
+
+       \Log::info('Sending admin registration email');
+
+        try {
+            Mail::to('admin@yourapp.com')
+                ->send(new BusinessRegisteredMail($business, $user));
+        } catch (\Exception $e) {
+            \Log::error('Admin registration email failed: '.$e->getMessage());
+        }
+
+        \Log::info('Sending admin invoice');
+
+        try {
+            Mail::to('admin@yourapp.com')
+                ->send(new InvoiceMail($business, $plan, $plan->price));
+        } catch (\Exception $e) {
+            \Log::error('Admin invoice failed: '.$e->getMessage());
+        }
+
+        \Log::info('Sending customer invoice');
+
+        try {
+            Mail::to($user->email)
+                ->send(new InvoiceMail($business, $plan, $plan->price));
+        } catch (\Exception $e) {
+            \Log::error('Customer invoice failed: '.$e->getMessage());
+        }
         DB::commit();
 
-        return redirect()->route('login')->with('success', 'Account created. Check your email.');
+        return redirect()->route('login')->with('success', 'Account created successfully! Please check your email.');
 
     } catch (\Exception $e) {
         DB::rollBack();

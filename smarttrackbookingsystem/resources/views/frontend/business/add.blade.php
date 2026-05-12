@@ -39,7 +39,7 @@
 
             {{-- STEP 1 --}}
             <div class="step step-1">
-                <h4>Your Business Info</h4>
+                <h4>Your Business Information</h4>
 
                 <input type="text" name="business_name" placeholder="Business Name" required>
                 <input type="email" name="email" placeholder="Business Email" required>
@@ -58,7 +58,7 @@
                 <input type="text" name="country" placeholder="Country">
                 <input type="text" name="postal_code" placeholder="Postal Code">
 
-                <div class="btn-group">
+                <div class="d-flex justify-content-between gap-2">
                     <button type="button" class="back-btn">← Back</button>
                     <button type="button" class="next-btn">Continue →</button>
                 </div>
@@ -71,7 +71,7 @@
                 <input type="text" name="business_type" placeholder="Business Type">
                 <textarea name="description" placeholder="Description"></textarea>
 
-                <div class="btn-group">
+                <div class="d-flex justify-content-between gap-2">
                     <button type="button" class="back-btn">← Back</button>
                     <button type="button" class="next-btn">Continue →</button>
                 </div>
@@ -83,9 +83,9 @@
 
                 <input type="text" name="owner_name" placeholder="Owner Name" required>
 
-                <div class="btn-group">
+                <div class="d-flex justify-content-between gap-2 d-flex">
                     <button type="button" class="back-btn">← Back</button>
-                    <button type="submit" id="submitBtn">Continue to Payment →</button>
+                    <button type="submit" class="bg-success" id="submitBtn">Continue to Payment →</button>
                 </div>
             </div>
 

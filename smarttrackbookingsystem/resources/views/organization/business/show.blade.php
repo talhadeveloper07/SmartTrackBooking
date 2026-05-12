@@ -3,36 +3,36 @@
 
 <div class="container">
 
-    <h3 class="mb-4">{{ ucwords($business->name) }} Details</h3>
+    <h3 class="mb-4">{{ ucwords($businessDetails->name) }} Details</h3>
 
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
 
                 <div class="col-md-2">
-                    @if($business->logo)
-                        <img src="{{ asset('storage/'.$business->logo) }}" class="img-fluid rounded">
+                    @if($businessDetails->logo)
+                        <img src="{{ asset('storage/'.$businessDetails->logo) }}" class="img-fluid rounded">
                     @endif
                 </div>
 
                 <div class="col-md-10">
                     <div class="d-flex justify-content-between">
-                        <h4>{{ ucwords($business->name) }}</h4>
-                        <a href="{{ route('org.business.edit',$business->slug) }}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+                        <h4>{{ ucwords($businessDetails->name) }}</h4>
+                        <a href="{{ route('org.business.edit',$businessDetails->slug) }}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
                     </div>
-                    <p class="text-muted">{{ $business->business_type }}</p>
+                    <p class="text-muted">{{ $businessDetails->business_type }}</p>
 
                     <div class="row mt-3">
-                        <div class="col-md-4"><strong>Email:</strong> {{ $business->email }}</div>
-                        <div class="col-md-4"><strong>Phone:</strong> {{ $business->phone }}</div>
+                        <div class="col-md-4"><strong>Email:</strong> {{ $businessDetails->email }}</div>
+                        <div class="col-md-4"><strong>Phone:</strong> {{ $businessDetails->phone }}</div>
                         <div class="col-md-4"><strong>Status:</strong> 
-                            <span class="badge bg-success">{{ ucfirst($business->status) }}</span>
+                            <span class="badge bg-success">{{ ucfirst($businessDetails->status) }}</span>
                         </div>
                     </div>
 
                     <div class="mt-3">
                         <strong>Address:</strong>
-                        {{ $business->address }}, {{ $business->city }}, {{ $business->country }}
+                        {{ $businessDetails->address }}, {{ $businessDetails->city }}, {{ $businessDetails->country }}
                     </div>
 
                 </div>
@@ -44,7 +44,7 @@
         <div class="card-header d-flex justify-content-between">
             <h4>Business Admins</h4>
 
-            <a href="{{ route('org.business.admins.create',$business->slug) }}"
+            <a href="{{ route('org.business.admins.create',$businessDetails->slug) }}"
                class="btn btn-primary btn-sm">
                 Add Admin
             </a>
@@ -64,7 +64,7 @@
                 </thead>
 
                 <tbody>
-                    @forelse($business->admins as $admin)
+                    @forelse($businessDetails->admins as $admin)
                     <tr>
                         <td>{{ ucwords($admin->name) }}</td>
                         <td>{{ $admin->email }}</td>

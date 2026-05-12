@@ -45,7 +45,7 @@
 									<h5>Total Customers</h5>
 									<h2 class="fs-40 font-w600">{{ $totalCustomers }}</h2>
 								</div>
-								 <div><span class="donut1" data-peity='{ "fill": ["rgb(255, 135, 35,1)", "rgba(242, 246, 252)"]}'>5/8</span>
+								 <div><span class="donut1" data-peity='{ "fill": ["rgb(255, 135, 35,1)", "rgba(242, 246, 252)"]}'> {{ $totalCustomers }}/{{ $plan->max_customers ?? '-' }}</span>
                                  </div>
 							</div>
 						</div>
@@ -57,7 +57,7 @@
 									<h5>Total Employees</h5>
 									<h2 class="fs-40 font-w600">{{$totalEmployees}}</h2>
 								</div>
-								 <div><span class="donut1" data-peity='{ "fill": ["rgb(51, 62, 75,1)", "rgba(242, 246, 252)"]}'>3/8</span>
+								 <div><span class="donut1" data-peity='{ "fill": ["rgb(51, 62, 75,1)", "rgba(242, 246, 252)"]}'>{{ $totalEmployees }}/{{ $plan->max_employees ?? '-' }}</span>
                                  </div>
 							</div>
 						</div>

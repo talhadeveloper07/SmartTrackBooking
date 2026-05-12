@@ -151,9 +151,14 @@ class BusinessController extends Controller
 
     public function show(Business $business)
     {
-        // eager load admins + users
+        if (!$business->exists) {
+            abort(404);
+        }
+        // eager load admins
         $business->load('admins');
 
-        return view('organization.business.show', compact('business'));
+       return view('organization.business.show', [
+    'businessDetails' => $business
+]);
     }
 }

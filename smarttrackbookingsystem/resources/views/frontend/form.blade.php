@@ -9,6 +9,6 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.jsx'])
 </head>
 <body>
-    <div id="customer-appointment-app" data-business-slug="massage-stone"></div>
+    <div id="customer-appointment-app" data-business-slug="massage-stone-wellness-464"></div>
 </body>
 </html>

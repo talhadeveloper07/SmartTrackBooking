@@ -184,7 +184,7 @@
 										<span class="fs-18 font-w500 text-end">Roberto</span>
 										<small class="text-end fs-14 font-w400">robert@mail.com</small>
 									</div>
-                                    <img src="images/profile/pic1.jpg" width="20" alt="">
+                                    <img src="/icons/user.png" width="20" alt="">
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a href="app-profile.html" class="dropdown-item ai-icon">

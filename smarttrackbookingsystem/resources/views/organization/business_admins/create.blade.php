@@ -18,7 +18,7 @@
                     <h3>Add New Business Admin Account</h3>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('org.business.admins.store', $business->slug) }}" method="POST">
+                    <form action="{{ route('org.business.admins.store', $businessDetails->slug) }}" method="POST">
                         @csrf
 
                         <div class="row">

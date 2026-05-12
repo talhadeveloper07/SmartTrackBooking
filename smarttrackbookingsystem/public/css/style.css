@@ -31974,3 +31974,139 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
     z-index: 9999;
     padding: 20px 12px;
 }
+
+.gradient-btn {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    padding: 16px 30px;
+    gap: 0.4rem;
+    border: none;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    background: linear-gradient(
+        15deg,
+        #880088,
+        #aa2068,
+        #cc3f47,
+        #de6f3d,
+        #f09f33,
+        #de6f3d,
+        #cc3f47,
+        #aa2068,
+        #880088
+    ) no-repeat;
+    background-size: 300%;
+    background-position: left center;
+    transition: background 0.3s ease;
+    color: #fff;
+}
+
+.gradient-btn:hover {
+    background-size: 320%;
+    background-position: right center;
+}
+
+.gradient-btn:hover .gradient-icon {
+    fill: #fff;
+}
+
+.gradient-icon {
+    width: 23px;
+    fill: #f09f33;
+    transition: 0.3s ease;
+}
+
+/* subscription blade design css */
+
+.subscription-wrapper {
+    display: flex;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 230px;
+    background: #000;
+    color: #fff;
+    padding: 20px;
+}
+
+.sidebar .logo {
+    margin-bottom: 30px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+    background: #1f2937;
+}
+
+/* CONTENT */
+.content {
+    flex: 1;
+    padding: 30px;
+}
+
+/* PLAN CARD */
+.plan-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+.active-plan {
+    display: flex;
+    justify-content: space-between;
+}
+
+.plan-left ul {
+    padding-left: 15px;
+}
+
+.plan-left li {
+    margin-bottom: 5px;
+}
+
+.plan-right {
+    text-align: right;
+}
+
+.badge {
+    background: #000;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+/* ALERT */
+.alert-box {
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* GRID */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}

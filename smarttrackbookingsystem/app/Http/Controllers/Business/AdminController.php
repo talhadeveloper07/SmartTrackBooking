@@ -14,29 +14,27 @@ use App\Services\Business\Profile\ProfileService;
 class AdminController extends Controller
 {
     public function index(Business $business)
-    {
+{
+    // ✅ Stats
     $totalAppointments = Appointment::where('business_id', $business->id)->count();
 
     $pendingAppointments = Appointment::where('business_id', $business->id)
-        ->whereIn('status', ['pending']) // add 'confirmed' if you want as pending-like
+        ->where('status', 'pending')
         ->count();
 
     $totalCustomers = Customer::where('business_id', $business->id)->count();
 
     $totalEmployees = Employee::where('business_id', $business->id)->count();
-    
+
     $recentCustomers = Customer::where('business_id', $business->id)
         ->with('user:id,name,email')
         ->latest()
         ->limit(4)
         ->get();
 
-  
-    $user = auth()->user();
-
-    $business = $user->businessAdmin->business ?? null;
-
-    $subscription = $business ? $business->subscription : null;
+    // ✅ Subscription + Plan
+    $subscription = $business->subscription;
+    $plan = $subscription ? $subscription->plan : null;
 
     return view('business.admin.dashboard', compact(
         'business',
@@ -45,9 +43,10 @@ class AdminController extends Controller
         'totalCustomers',
         'totalEmployees',
         'recentCustomers',
-        'subscription'
+        'subscription',
+        'plan'
     ));
-    }
+}
     public function edit(Business $business)
     {
         $setting = $business->dashboardSetting()->firstOrCreate([]);

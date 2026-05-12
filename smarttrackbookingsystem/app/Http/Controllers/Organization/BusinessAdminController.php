@@ -14,7 +14,7 @@ class BusinessAdminController extends Controller
 {
      public function create(Business $business)
     {
-        return view('organization.business_admins.create', compact('business'));
+        return view('organization.business_admins.create', ['businessDetails' => $business]);
     }
      public function store(Request $request, Business $business)
     {

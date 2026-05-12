@@ -2,73 +2,84 @@
 
 @section('business_content')
 
-    <div class="container">
+<div class="container-fluid">
 
-        <h3 class="mb-4">Subscription</h3>
+
+    {{-- MAIN CONTENT --}}
+    <div class="content">
+
+        <h3 class="mb-4">Subscription Plans</h3>
 
         {{-- CURRENT PLAN --}}
-        <div class="card mb-4">
-            <div class="card-body">
+        @if($subscription)
+        <div class="plan-card active-plan">
 
-                <h5>Current Plan</h5>
+            <div class="plan-left">
+                <h5>{{ $subscription->plan->name ?? 'Premium Plan' }}</h5>
+                <h3 class="d-flex align-items-center gap-2">${{ $subscription->plan->price ?? '29.99' }} <span class="badge bg-success">Current Plan</span> </h3>
 
-                @if($subscription)
-                    <p><strong>Status:</strong> {{ ucfirst($subscription->status) }}</p>
 
-                    <p>
-                        <strong>Ends At:</strong>
-                        {{ $subscription->ends_at ? $subscription->ends_at->format('d M Y') : 'N/A' }}
-                    </p>
+                <p>Next billing:
+                    {{ $subscription->ends_at ? $subscription->ends_at->format('d M Y') : 'N/A' }}
+                </p>
 
-                    @if($subscription->status === 'trial')
-                        <div class="alert alert-warning">
-                            Trial ends in {{ now()->diffInDays($subscription->trial_ends_at) }} days
-                        </div>
-                    @endif
-                @else
-                    <p>No active subscription</p>
-                @endif
+                <ul class="p-0">
+                    <li>✔ {{ $subscription->plan->max_employees }} no of <strong>Employees</strong></li>
+                    <li>✔ {{ $subscription->plan->max_employees }} no of <strong>Services</strong></li>
+                    <li>✔ {{ $subscription->plan->max_employees }} no of <strong>Bookings</strong></li>
+                </ul>
 
-                <a href="{{ route('business.billing.portal', $business->slug) }}" class="btn btn-primary">
-    Manage Billing
-</a>
-
+                <div class="alert-box">
+                    Your subscription will renew automatically
+                </div>
             </div>
-        </div>
 
-        {{-- PLANS --}}
-        <div class="row">
+            <div class="plan-right d-flex justify-content-start flex-column">
+                <a href="{{ route('business.billing.portal', $business->slug) }}" class="btn light text-dark">
+                    Manage Billing
+                </a>
+            </div>
+
+        </div>
+        @endif
+
+        {{-- OTHER PLANS --}}
+        <div class="plans-grid">
 
             @foreach($plans as $plan)
 
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body text-center">
+                @if(!$subscription || $subscription->plan_id != $plan->id)
 
-                            <h5>{{ $plan->name }}</h5>
-                            <h4>${{ $plan->price }}</h4>
+                <div class="plan-card">
 
-                            @if($subscription && $subscription->plan_id == $plan->id)
-                                <button class="btn btn-secondary" disabled>
-                                    Current Plan
-                                </button>
-                            @else
-                                <form method="POST" action="{{ route('business.upgrade.plan', $business->slug) }}">
-                                    @csrf
-                                    <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                    <h5>{{ $plan->name }}</h5>
+                    <h3>${{ $plan->price }}/Month</h3>
 
-                                    <button class="btn btn-success">Upgrade</button>
-                                </form>
-                            @endif
+                    <ul>
+                        <li>✔ Feature 1</li>
+                        <li>✔ Feature 2</li>
+                        <li>✔ Feature 3</li>
+                    </ul>
 
-                        </div>
-                    </div>
+                    <form method="POST" action="{{ route('business.upgrade.plan', $business->slug) }}">
+                        @csrf
+                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+
+                        <button class="btn primary w-100">
+                            Upgrade
+                        </button>
+                    </form>
+
                 </div>
+
+                @endif
 
             @endforeach
 
         </div>
 
     </div>
+
+</div>
 
 @endsection
